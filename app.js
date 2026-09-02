@@ -1692,6 +1692,14 @@ function normalizeLeaveEvent(event) {
 
   event.status =
 
+    event.cancelled === true
+
+    ?
+
+    "취소"
+
+    :
+
     event.remainingHours === 0
 
     ?
