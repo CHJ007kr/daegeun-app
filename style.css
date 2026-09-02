@@ -497,6 +497,23 @@ body {
 }
 
 
+.calendar-day.sunday .day-number,
+.calendar-day.holiday .day-number {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+
+.calendar-day.saturday:not(.holiday) .day-number {
+  color: #2457b2;
+}
+
+
+.calendar-day.past.holiday {
+  opacity: 0.78;
+}
+
+
 
 /* =========================================
    주 / 야 / 휴 표시
@@ -616,6 +633,14 @@ body {
   font-size: 12px;
 
   color: #777;
+}
+
+
+.selected-holiday-info {
+  margin-top: 5px;
+  color: #d32f2f;
+  font-size: 13px;
+  font-weight: bold;
 }
 
 

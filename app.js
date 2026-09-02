@@ -104,6 +104,27 @@ const leaveRules = {
 
 
 /* =========================================================
+   대근 요청 대상 교대조
+========================================================= */
+
+const annualLeaveInitialShiftMap = {
+  "1조": ["2조", "4조"],
+  "2조": ["1조", "3조"],
+  "3조": ["2조", "4조"],
+  "4조": ["1조", "3조"]
+};
+
+
+const allShiftGroups = [
+  "1조",
+  "2조",
+  "3조",
+  "4조"
+];
+
+
+
+/* =========================================================
    날짜를 YYYY-MM-DD로 변환
 ========================================================= */
 
@@ -1289,7 +1310,11 @@ function getMyLeaveEventsForDate(date) {
         event.name === currentName
       ) {
 
-        return event;
+        return (
+          event.cancelled === true
+          ? null
+          : event
+        );
 
       }
 
@@ -1380,7 +1405,11 @@ function getMyWorkEventsForDate(date) {
         event.name === currentName
       ) {
 
-        return event;
+        return (
+          event.cancelled === true
+          ? null
+          : event
+        );
 
       }
 
@@ -1684,6 +1713,161 @@ function normalizeLeaveEvent(event) {
    휴가 등록 화면
 ========================================================= */
 
+function dateFromKey(dateString) {
+
+  const parts =
+    dateString.split(
+      "-"
+    );
+
+
+  return new Date(
+    Number(parts[0]),
+    Number(parts[1]) - 1,
+    Number(parts[2])
+  );
+
+}
+
+
+
+/* =========================================================
+   휴가 요청의 대상 교대조 계산
+
+   향후 Firebase 알림 대상 계산에서도 같은 함수를 사용한다.
+========================================================= */
+
+function getTargetShiftGroups(request) {
+
+  const normalizedRequest =
+    normalizeLeaveEvent(
+      request
+    );
+
+
+  if (
+    normalizedRequest.type !== "휴가"
+    ||
+    normalizedRequest.cancelled === true
+    ||
+    normalizedRequest.remainingHours <= 0
+  ) {
+
+    return [];
+
+  }
+
+
+  if (
+    normalizedRequest.title === "연차"
+    &&
+    normalizedRequest.claimedHours === 0
+  ) {
+
+    return (
+      annualLeaveInitialShiftMap[
+        normalizedRequest.shift
+      ]
+      ||
+      []
+    ).slice();
+
+  }
+
+
+  return allShiftGroups.filter(
+
+    function(shift) {
+
+      return (
+        shift !== normalizedRequest.shift
+      );
+
+    }
+
+  );
+
+}
+
+
+
+/* =========================================================
+   대근 요청 수신 가능 여부
+
+   user를 생략하면 현재 localStorage 사용자를 판정한다.
+   향후 알림에서는 { name, shift, area, role }을 전달할 수 있다.
+========================================================= */
+
+function canUserReceiveDaegunRequest(
+  request,
+  user
+) {
+
+  const candidate =
+    user
+    ||
+    {
+      name: localStorage.getItem("userName"),
+      shift: getShiftForDate(
+        dateFromKey(request.date)
+      ),
+      area: localStorage.getItem("userArea"),
+      role: localStorage.getItem("userRole")
+    };
+
+
+  if (
+    !candidate.name
+    ||
+    candidate.name === request.name
+    ||
+    candidate.area !== request.area
+    ||
+    candidate.role !== request.role
+  ) {
+
+    return false;
+
+  }
+
+
+  return getTargetShiftGroups(
+    request
+  ).includes(
+    candidate.shift
+  );
+
+}
+
+
+
+function hasUserClaimedDaegun(
+  request,
+  userName
+) {
+
+  const normalizedRequest =
+    normalizeLeaveEvent(
+      request
+    );
+
+
+  return normalizedRequest.claims.some(
+
+    function(claim) {
+
+      return (
+        claim.name === userName
+      );
+
+    }
+
+  );
+
+}
+
+
+
 function openLeave() {
 
   if (
@@ -1700,6 +1884,30 @@ function openLeave() {
     return;
 
   }
+
+
+  const today =
+    new Date();
+
+
+  calendarDate =
+    new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1
+    );
+
+
+  selectedDate =
+    null;
+
+
+  leaveRangeStartDate =
+    null;
+
+
+  leaveRangeEndDate =
+    null;
 
 
   hideAllScreens();
@@ -2037,6 +2245,14 @@ function resetLeaveSelectedInfo() {
 
   document
     .getElementById(
+      "selectedHolidayInfo"
+    )
+    .textContent =
+      "";
+
+
+  document
+    .getElementById(
       "selectedShiftInfo"
     )
     .textContent =
@@ -2170,6 +2386,12 @@ function updateLeaveSelected() {
     );
 
 
+  const holiday =
+    getHoliday(
+      selectedDate
+    );
+
+
   document
     .getElementById(
       "selectedDateText"
@@ -2196,6 +2418,18 @@ function updateLeaveSelected() {
 
       +
       "일";
+
+
+  document
+    .getElementById(
+      "selectedHolidayInfo"
+    )
+    .textContent =
+      holiday
+      ?
+      holiday.name
+      :
+      "";
 
 
   document
@@ -2285,6 +2519,8 @@ function isDuplicateLeave(
 
       return (
         event.type === "휴가"
+        &&
+        event.cancelled !== true
         &&
         event.name === userName
         &&
@@ -3025,6 +3261,43 @@ function renderMyClaimControls(
   myClaim
 ) {
 
+  if (
+    request.cancelled === true
+  ) {
+
+    return `
+
+      <div class="request-complete">
+        대근 ${myClaim.hours}h
+      </div>
+
+      <div class="claim-change-label request-notice">
+        취소된 휴가의 확정 대근 기록입니다.
+      </div>
+
+    `;
+
+  }
+
+
+  if (
+    request.date < dateKey(new Date())
+  ) {
+
+    return `
+
+      <div class="request-complete">
+        대근 ${myClaim.hours}h
+      </div>
+
+      <div class="claim-change-label request-notice">
+        지난 대근 기록은 변경하거나 취소할 수 없습니다.
+      </div>
+
+    `;
+
+  }
+
   return `
 
     <div class="request-complete">
@@ -3103,6 +3376,8 @@ function renderDaegunRequests() {
           return (
             event.type ===
             "휴가"
+            &&
+            event.cancelled !== true
           );
 
         }
@@ -3167,6 +3442,29 @@ function renderDaegunRequests() {
   const currentName =
     localStorage.getItem(
       "userName"
+    );
+
+
+  requests =
+    requests.filter(
+
+      function(request) {
+
+        return (
+          request.name === currentName
+          ||
+          hasUserClaimedDaegun(
+            request,
+            currentName
+          )
+          ||
+          canUserReceiveDaegunRequest(
+            request
+          )
+        );
+
+      }
+
     );
 
 
@@ -3787,6 +4085,47 @@ function claimDaegun(
     );
 
 
+  if (
+    request.date < dateKey(new Date())
+  ) {
+
+    alert(
+      "지난 날짜의 대근은 신청할 수 없습니다."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    request.cancelled === true
+  ) {
+
+    alert(
+      "취소된 휴가 요청에는 대근을 신청할 수 없습니다."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !canUserReceiveDaegunRequest(
+      request
+    )
+  ) {
+
+    alert(
+      "현재 사용자에게 배정된 대근 요청이 아닙니다."
+    );
+
+    return;
+
+  }
+
+
   /*
     본인 휴가는 본인이 잡지 못함
   */
@@ -3994,6 +4333,32 @@ function updateDaegunClaimHours(
     );
 
 
+  if (
+    request.date < dateKey(new Date())
+  ) {
+
+    alert(
+      "지난 날짜의 대근시간은 변경할 수 없습니다."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    request.cancelled === true
+  ) {
+
+    alert(
+      "취소된 휴가의 대근 기록은 변경할 수 없습니다."
+    );
+
+    return;
+
+  }
+
+
   const claim =
     request.claims.find(
 
@@ -4184,6 +4549,32 @@ function cancelDaegunClaim(
     );
 
 
+  if (
+    request.date < dateKey(new Date())
+  ) {
+
+    alert(
+      "지난 날짜의 대근은 취소할 수 없습니다."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    request.cancelled === true
+  ) {
+
+    alert(
+      "취소된 휴가의 대근 기록은 취소할 수 없습니다."
+    );
+
+    return;
+
+  }
+
+
   request.claims =
     request.claims.filter(
 
@@ -4264,6 +4655,22 @@ function openWorkCalendar() {
   }
 
 
+  const today =
+    new Date();
+
+
+  workCalendarDate =
+    new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1
+    );
+
+
+  workSelectedDateValue =
+    null;
+
+
   hideAllScreens();
 
 
@@ -4283,6 +4690,9 @@ function openWorkCalendar() {
     )
     .innerHTML =
       getUserSummary();
+
+
+  resetWorkSelectedInfo();
 
 
   renderWorkCalendar();
@@ -4343,6 +4753,14 @@ function resetWorkSelectedInfo() {
     )
     .textContent =
       "달력에서 날짜를 눌러주세요.";
+
+
+  document
+    .getElementById(
+      "workSelectedHolidayInfo"
+    )
+    .textContent =
+      "";
 
 
   document
@@ -4442,6 +4860,12 @@ function updateWorkSelected() {
     calendarInfo.shift;
 
 
+  const holiday =
+    getHoliday(
+      workSelectedDateValue
+    );
+
+
   document
     .getElementById(
       "workSelectedDate"
@@ -4471,6 +4895,18 @@ function updateWorkSelected() {
 
       +
       "일";
+
+
+  document
+    .getElementById(
+      "workSelectedHolidayInfo"
+    )
+    .textContent =
+      holiday
+      ?
+      holiday.name
+      :
+      "";
 
 
   document
@@ -4831,6 +5267,48 @@ function renderCalendar(
       dateKey(
         date
       );
+
+
+    const holiday =
+      getHoliday(
+        date
+      );
+
+
+    if (
+      holiday
+    ) {
+
+      cell.classList.add(
+        "holiday"
+      );
+
+      cell.title =
+        holiday.name;
+
+    }
+
+
+    else if (
+      date.getDay() === 0
+    ) {
+
+      cell.classList.add(
+        "sunday"
+      );
+
+    }
+
+
+    else if (
+      date.getDay() === 6
+    ) {
+
+      cell.classList.add(
+        "saturday"
+      );
+
+    }
 
 
     if (
@@ -5211,7 +5689,7 @@ function renderSelectedEvents(
                 class="delete-button"
                 onclick="deleteEvent(${request.id})"
               >
-                삭제
+                휴가 취소
               </button>
 
             </div>
@@ -5263,18 +5741,105 @@ function deleteEvent(id) {
     getEvents();
 
 
-  events =
-    events.filter(
+  const index =
+    events.findIndex(
 
       function(item) {
 
         return (
-          item.id !== id
+          item.id === id
         );
 
       }
 
     );
+
+
+  if (
+    index === -1
+  ) {
+
+    return;
+
+  }
+
+
+  const event =
+    events[index];
+
+
+  if (
+    event.type === "휴가"
+  ) {
+
+    const currentName =
+      localStorage.getItem(
+        "userName"
+      );
+
+
+    if (
+      event.name !== currentName
+    ) {
+
+      alert(
+        "본인이 등록한 휴가만 취소할 수 있습니다."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      event.date < dateKey(new Date())
+    ) {
+
+      alert(
+        "지난 날짜의 휴가는 취소할 수 없습니다."
+      );
+
+      return;
+
+    }
+
+
+    /*
+      휴가 취소 뒤에도 기존 claims를 유지해야
+      대근자의 근무 달력 기록이 사라지지 않는다.
+    */
+
+    events[index] =
+      Object.assign(
+        {},
+        event,
+        {
+          cancelled: true,
+          cancelledAt:
+            new Date().toISOString()
+        }
+      );
+
+  }
+
+
+  else {
+
+
+    events =
+      events.filter(
+
+        function(item) {
+
+          return (
+            item.id !== id
+          );
+
+        }
+
+      );
+
+  }
 
 
   saveEvents(
