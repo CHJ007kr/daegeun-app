@@ -20,11 +20,15 @@
     .app {
       max-width: 480px;
       margin: 0 auto;
-      padding: 24px 16px 50px;
+      padding: 24px 16px 60px;
+    }
+
+    .hidden {
+      display: none;
     }
 
     .header {
-      margin-bottom: 28px;
+      margin-bottom: 26px;
     }
 
     .header h1 {
@@ -50,7 +54,6 @@
       padding: 20px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.08);
       cursor: pointer;
-      transition: 0.2s;
     }
 
     .menu-card:active {
@@ -71,10 +74,6 @@
     .icon {
       font-size: 28px;
       margin-bottom: 10px;
-    }
-
-    .hidden {
-      display: none;
     }
 
     .back-button {
@@ -129,11 +128,20 @@
     }
 
     .saved-message {
+      display: none;
       margin-top: 14px;
       text-align: center;
       color: #2e7d32;
       font-size: 14px;
-      display: none;
+    }
+
+    .user-summary {
+      padding: 14px;
+      margin-bottom: 16px;
+      background: #eef2f5;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.7;
     }
 
     /* 달력 */
@@ -174,14 +182,23 @@
       padding-bottom: 8px;
     }
 
+    .weekday:first-child {
+      color: #d32f2f;
+    }
+
+    .weekday:last-child {
+      color: #2457b2;
+    }
+
     .calendar-day {
-      min-height: 60px;
+      min-height: 78px;
       border: 1px solid #e1e4e8;
       border-radius: 10px;
-      padding: 6px 3px;
+      padding: 6px 2px;
       text-align: center;
       cursor: pointer;
       background: white;
+      overflow: hidden;
     }
 
     .calendar-day.empty {
@@ -190,7 +207,7 @@
 
     .calendar-day.selected {
       border: 2px solid #222;
-      background: #f1f3f5;
+      background: #f7f7f7;
     }
 
     .day-number {
@@ -204,11 +221,12 @@
       font-weight: bold;
       padding: 3px 6px;
       border-radius: 8px;
+      margin-bottom: 3px;
     }
 
     .shift-day {
       background: #fff3cd;
-      color: #7a5b00;
+      color: #806000;
     }
 
     .shift-night {
@@ -219,6 +237,34 @@
     .shift-off {
       background: #e9ecef;
       color: #666;
+    }
+
+    .event-badge {
+      display: block;
+      margin: 2px auto 0;
+      padding: 2px 3px;
+      max-width: 95%;
+      border-radius: 5px;
+      font-size: 9px;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-leave {
+      background: #ffe3e3;
+      color: #c92a2a;
+    }
+
+    .event-daegun {
+      background: #d3f9d8;
+      color: #187b2f;
+    }
+
+    .event-education {
+      background: #e5dbff;
+      color: #6741d9;
     }
 
     .selected-info {
@@ -234,9 +280,15 @@
       margin-bottom: 6px;
     }
 
-    /* 휴가 종류 */
+    .selected-event-list {
+      margin-top: 8px;
+      font-size: 13px;
+      line-height: 1.7;
+    }
 
-    .leave-title {
+    /* 휴가 선택 */
+
+    .section-title {
       margin: 0 0 14px;
       font-size: 18px;
     }
@@ -262,26 +314,43 @@
       height: 18px;
     }
 
-    .leave-option span {
-      font-size: 15px;
-    }
-
-    .user-summary {
-      padding: 12px 14px;
-      margin-bottom: 16px;
-      background: #eef2f5;
-      border-radius: 12px;
-      font-size: 13px;
-      line-height: 1.7;
-    }
-
     .notice {
-      font-size: 12px;
-      color: #777;
-      line-height: 1.5;
       margin-top: 12px;
+      color: #777;
+      font-size: 12px;
+      line-height: 1.5;
     }
 
+    .secondary-button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      background: white;
+      color: #222;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .event-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
+
+    .delete-button {
+      border: none;
+      border-radius: 8px;
+      padding: 6px 8px;
+      background: #f1f3f5;
+      cursor: pointer;
+      font-size: 12px;
+    }
   </style>
 </head>
 
@@ -289,8 +358,7 @@
 
 <div class="app">
 
-  <!-- ================= 메인 ================= -->
-
+  <!-- 메인 -->
   <div id="homeScreen">
 
     <div class="header">
@@ -300,14 +368,13 @@
 
     <div class="menu">
 
-      <div class="menu-card" onclick="openDaegun()">
-        <div class="icon">🕐</div>
-        <h2>대근 등록</h2>
-        <p>휴가 일정을 등록하고 대근 요청을 생성합니다.</p>
+      <div class="menu-card" onclick="openLeave()">
+        <div class="icon">🌴</div>
+        <h2>휴가 등록</h2>
+        <p>휴가를 등록하고 대근 요청을 생성합니다.</p>
       </div>
 
-      <div class="menu-card"
-           onclick="alert('근무 달력 화면은 다음 단계에서 만들 예정입니다.')">
+      <div class="menu-card" onclick="openWorkCalendar()">
         <div class="icon">📅</div>
         <h2>근무 달력</h2>
         <p>주간 · 야간 · 휴무 · 대근 · 교육 일정을 확인합니다.</p>
@@ -323,8 +390,7 @@
   </div>
 
 
-  <!-- ================= 개인 설정 ================= -->
-
+  <!-- 개인설정 -->
   <div id="settingsScreen" class="hidden">
 
     <button class="back-button" onclick="goHome()">← 돌아가기</button>
@@ -337,13 +403,12 @@
     <div class="form-card">
 
       <div class="form-group">
-        <label for="name">이름</label>
+        <label>이름</label>
         <input type="text" id="name" placeholder="이름을 입력하세요">
       </div>
 
       <div class="form-group">
-        <label for="shift">교대조</label>
-
+        <label>교대조</label>
         <select id="shift">
           <option value="">선택하세요</option>
           <option value="1조">1조</option>
@@ -354,8 +419,7 @@
       </div>
 
       <div class="form-group">
-        <label for="area">근무지역</label>
-
+        <label>근무지역</label>
         <select id="area">
           <option value="">선택하세요</option>
           <option value="NO.1 PROCESS">NO.1 PROCESS</option>
@@ -365,8 +429,7 @@
       </div>
 
       <div class="form-group">
-        <label for="role">근무 역할</label>
-
+        <label>근무 역할</label>
         <select id="role">
           <option value="">선택하세요</option>
           <option value="기술장">기술장</option>
@@ -384,18 +447,16 @@
       </div>
 
     </div>
-
   </div>
 
 
-  <!-- ================= 대근 등록 ================= -->
-
-  <div id="daegunScreen" class="hidden">
+  <!-- 휴가등록 -->
+  <div id="leaveScreen" class="hidden">
 
     <button class="back-button" onclick="goHome()">← 돌아가기</button>
 
     <div class="header">
-      <h1>대근 등록</h1>
+      <h1>휴가 등록</h1>
       <p>휴가 날짜와 종류를 선택합니다.</p>
     </div>
 
@@ -404,19 +465,10 @@
     <div class="calendar-card">
 
       <div class="calendar-header">
-
-        <button class="month-button" onclick="changeMonth(-1)">
-          ‹
-        </button>
-
+        <button class="month-button" onclick="changeMonth(-1)">‹</button>
         <h2 id="calendarTitle"></h2>
-
-        <button class="month-button" onclick="changeMonth(1)">
-          ›
-        </button>
-
+        <button class="month-button" onclick="changeMonth(1)">›</button>
       </div>
-
 
       <div class="weekdays">
         <div class="weekday">일</div>
@@ -428,20 +480,12 @@
         <div class="weekday">토</div>
       </div>
 
-
       <div id="calendarGrid" class="calendar-grid"></div>
 
-
       <div class="selected-info">
-
-        <strong id="selectedDateText">
-          날짜를 선택하세요.
-        </strong>
-
-        <span id="selectedShiftText">
-          달력에서 날짜를 눌러주세요.
-        </span>
-
+        <strong id="selectedDateText">날짜를 선택하세요.</strong>
+        <span id="selectedShiftText">달력에서 날짜를 눌러주세요.</span>
+        <div id="selectedEvents" class="selected-event-list"></div>
       </div>
 
     </div>
@@ -449,7 +493,7 @@
 
     <div class="form-card">
 
-      <h2 class="leave-title">휴가 종류</h2>
+      <h2 class="section-title">휴가 종류</h2>
 
       <div class="leave-options">
 
@@ -486,13 +530,12 @@
         휴가 등록하기
       </button>
 
-      <div id="leaveSavedMessage" class="saved-message">
-        등록되었습니다.
-      </div>
+      <div id="leaveSavedMessage" class="saved-message"></div>
 
       <div class="notice">
-        현재는 테스트 단계이므로 등록 내용은 이 기기의 브라우저에만
-        저장됩니다. 나중에 Firebase를 연결하면 팀원들과 공유됩니다.
+        현재는 테스트 단계이므로 이 기기에만 저장됩니다.
+        Firebase 연결 후에는 등록 즉시 조건에 맞는 팀원들에게
+        대근 요청이 전달되도록 변경할 예정입니다.
       </div>
 
     </div>
@@ -500,96 +543,198 @@
   </div>
 
 
+  <!-- 근무 달력 -->
+  <div id="workCalendarScreen" class="hidden">
+
+    <button class="back-button" onclick="goHome()">← 돌아가기</button>
+
+    <div class="header">
+      <h1>근무 달력</h1>
+      <p>기본 교대근무와 실제 일정을 확인합니다.</p>
+    </div>
+
+    <div id="workUserSummary" class="user-summary"></div>
+
+    <div class="calendar-card">
+
+      <div class="calendar-header">
+        <button class="month-button" onclick="changeWorkMonth(-1)">‹</button>
+        <h2 id="workCalendarTitle"></h2>
+        <button class="month-button" onclick="changeWorkMonth(1)">›</button>
+      </div>
+
+      <div class="weekdays">
+        <div class="weekday">일</div>
+        <div class="weekday">월</div>
+        <div class="weekday">화</div>
+        <div class="weekday">수</div>
+        <div class="weekday">목</div>
+        <div class="weekday">금</div>
+        <div class="weekday">토</div>
+      </div>
+
+      <div id="workCalendarGrid" class="calendar-grid"></div>
+
+      <div class="selected-info">
+        <strong id="workSelectedDate">날짜를 선택하세요.</strong>
+        <span id="workSelectedShift"></span>
+        <div id="workSelectedEvents" class="selected-event-list"></div>
+      </div>
+
+    </div>
+
+    <!-- 현재는 대근/교육 테스트 입력용 -->
+    <div class="form-card">
+
+      <h2 class="section-title">일정 테스트 등록</h2>
+
+      <div class="form-group">
+        <label>일정 종류</label>
+        <select id="extraEventType">
+          <option value="대근">대근</option>
+          <option value="교육">교육</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>시간</label>
+        <input
+          type="number"
+          id="extraEventHours"
+          min="1"
+          max="24"
+          value="12"
+        >
+      </div>
+
+      <button class="save-button" onclick="saveExtraEvent()">
+        선택한 날짜에 일정 등록
+      </button>
+
+      <div class="notice">
+        이 입력창은 대근/교육이 달력에 어떻게 표시되는지
+        시험하기 위한 임시 기능입니다.
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
 
 
 <script>
 
   let calendarDate = new Date();
-
   let selectedDate = null;
-  let selectedWork = null;
+
+  let workCalendarDate = new Date();
+  let workSelectedDateValue = null;
 
 
-  /*
-    임시 교대 패턴
+  /* =========================================================
+     2026년 10월 실제 교대달력
+     사용자가 제공한 사진을 기준으로 입력
+  ========================================================= */
 
-    주 / 주 / 휴 / 휴 / 야 / 야 / 휴 / 휴
+  const october2026Schedule = {
 
-    실제 정유1팀 교대 달력을 받으면
-    기준일만 정확하게 맞출 예정
-  */
+    "1조": [
+      "휴","휴","야","야","휴","휴","주","주",
+      "휴","휴","야","야","휴","휴","주","주",
+      "휴","휴","야","야","휴","휴","주","주",
+      "휴","휴","야","야","휴","휴","주"
+    ],
 
-  const shiftPattern = [
-    "주",
-    "주",
-    "휴",
-    "휴",
-    "야",
-    "야",
-    "휴",
-    "휴"
-  ];
+    "2조": [
+      "주","주","휴","휴","주","주","주","주",
+      "주","주","주","휴","야","야","휴","주",
+      "주","주","주","휴","야","야","휴","주",
+      "주","주","주","휴","야","야","휴"
+    ],
 
+    "3조": [
+      "휴","휴","주","주","휴","휴","야","야",
+      "휴","휴","주","주","휴","휴","야","야",
+      "휴","휴","주","주","휴","휴","야","야",
+      "휴","휴","주","주","휴","휴","야"
+    ],
 
-  /*
-    현재는 임시 기준일.
+    "4조": [
+      "야","야","휴","휴","주","주","휴","휴",
+      "야","야","휴","휴","주","주","휴","휴",
+      "야","야","휴","휴","주","주","휴","휴",
+      "야","야","휴","휴","주","주","휴"
+    ]
 
-    2026년 9월 1일을
-    1조 패턴의 첫 번째 "주"로 가정.
-
-    실제 교대달력을 받으면 수정 예정.
-  */
-
-  const baseDate = new Date(2026, 8, 1);
-
-
-  const shiftOffsets = {
-    "1조": 0,
-    "2조": 2,
-    "3조": 4,
-    "4조": 6
   };
 
 
+  /*
+    다른 달 임시 계산용.
+
+    1조 / 3조 / 4조는 사진에서 명확한 반복패턴을 확인할 수 있음.
+    2조는 2026년 10월에 특이 편성이 있어
+    다른 달 자료를 추가로 확인한 뒤 보정 예정.
+  */
+
+  const fallbackPatterns = {
+
+    "1조": [
+      "휴","휴","야","야",
+      "휴","휴","주","주"
+    ],
+
+    "2조": [
+      "휴","야","야","휴",
+      "주","주","주","주"
+    ],
+
+    "3조": [
+      "주","주","휴","휴",
+      "야","야","휴","휴"
+    ],
+
+    "4조": [
+      "휴","휴","주","주",
+      "휴","휴","야","야"
+    ]
+
+  };
+
+
+  /* =========================================================
+     화면 이동
+  ========================================================= */
+
   function hideAllScreens() {
 
-    document
-      .getElementById("homeScreen")
-      .classList.add("hidden");
+    document.getElementById("homeScreen").classList.add("hidden");
+    document.getElementById("settingsScreen").classList.add("hidden");
+    document.getElementById("leaveScreen").classList.add("hidden");
+    document.getElementById("workCalendarScreen").classList.add("hidden");
 
-    document
-      .getElementById("settingsScreen")
-      .classList.add("hidden");
-
-    document
-      .getElementById("daegunScreen")
-      .classList.add("hidden");
   }
 
 
   function goHome() {
 
     hideAllScreens();
+    document.getElementById("homeScreen").classList.remove("hidden");
 
-    document
-      .getElementById("homeScreen")
-      .classList.remove("hidden");
   }
 
 
-  /* ================= 개인 설정 ================= */
-
+  /* =========================================================
+     개인설정
+  ========================================================= */
 
   function openSettings() {
 
     hideAllScreens();
-
-    document
-      .getElementById("settingsScreen")
-      .classList.remove("hidden");
-
+    document.getElementById("settingsScreen").classList.remove("hidden");
     loadSettings();
+
   }
 
 
@@ -608,25 +753,18 @@
       document.getElementById("role").value;
 
 
-    localStorage.setItem(
-      "userName",
-      name
-    );
+    if (!name || !shift || !area || !role) {
 
-    localStorage.setItem(
-      "userShift",
-      shift
-    );
+      alert("모든 항목을 입력해주세요.");
+      return;
 
-    localStorage.setItem(
-      "userArea",
-      area
-    );
+    }
 
-    localStorage.setItem(
-      "userRole",
-      role
-    );
+
+    localStorage.setItem("userName", name);
+    localStorage.setItem("userShift", shift);
+    localStorage.setItem("userArea", area);
+    localStorage.setItem("userRole", role);
 
 
     const message =
@@ -637,6 +775,7 @@
     setTimeout(() => {
       message.style.display = "none";
     }, 2000);
+
   }
 
 
@@ -653,76 +792,79 @@
 
     document.getElementById("role").value =
       localStorage.getItem("userRole") || "";
+
   }
 
 
+  function settingsReady() {
 
-  /* ================= 대근 등록 ================= */
+    return (
+      localStorage.getItem("userName") &&
+      localStorage.getItem("userShift") &&
+      localStorage.getItem("userArea") &&
+      localStorage.getItem("userRole")
+    );
 
-
-  function openDaegun() {
-
-    const name =
-      localStorage.getItem("userName");
-
-    const shift =
-      localStorage.getItem("userShift");
-
-    const area =
-      localStorage.getItem("userArea");
-
-    const role =
-      localStorage.getItem("userRole");
+  }
 
 
-    if (!name || !shift || !area || !role) {
+  function getUserSummary() {
 
-      alert(
-        "먼저 개인 설정을 완료해주세요."
-      );
+    const name = localStorage.getItem("userName");
+    const shift = localStorage.getItem("userShift");
+    const area = localStorage.getItem("userArea");
+    const role = localStorage.getItem("userRole");
 
-      openSettings();
-
-      return;
-    }
-
-
-    hideAllScreens();
-
-    document
-      .getElementById("daegunScreen")
-      .classList.remove("hidden");
-
-
-    document.getElementById(
-      "userSummary"
-    ).innerHTML = `
+    return `
       <strong>${name}</strong><br>
       ${shift} · ${area} · ${role}
     `;
 
-
-    renderCalendar();
   }
 
 
-
-  /* ================= 근무 계산 ================= */
-
+  /* =========================================================
+     근무 계산
+  ========================================================= */
 
   function getWorkType(date) {
 
-    const userShift =
+    const shift =
       localStorage.getItem("userShift") || "1조";
 
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
 
-    const offset =
-      shiftOffsets[userShift] || 0;
 
+    /*
+      2026년 10월은 사진 그대로 표시
+    */
+
+    if (year === 2026 && month === 10) {
+
+      const schedule =
+        october2026Schedule[shift];
+
+      if (schedule && schedule[day - 1]) {
+        return schedule[day - 1];
+      }
+
+    }
+
+
+    /*
+      그 외 달은 임시 반복 계산
+    */
+
+    const pattern =
+      fallbackPatterns[shift];
+
+    const baseDate =
+      new Date(2026, 9, 12);
 
     const oneDay =
       1000 * 60 * 60 * 24;
-
 
     const target =
       new Date(
@@ -731,60 +873,462 @@
         date.getDate()
       );
 
-
-    const base =
-      new Date(
-        baseDate.getFullYear(),
-        baseDate.getMonth(),
-        baseDate.getDate()
-      );
-
-
     let days =
       Math.round(
-        (target - base) / oneDay
+        (target - baseDate) / oneDay
       );
 
+    let index =
+      days % pattern.length;
 
-    let patternIndex =
-      (days + offset) %
-      shiftPattern.length;
-
-
-    if (patternIndex < 0) {
-      patternIndex +=
-        shiftPattern.length;
+    if (index < 0) {
+      index += pattern.length;
     }
 
+    return pattern[index];
 
-    return shiftPattern[
-      patternIndex
-    ];
   }
 
 
+  function workText(type) {
 
-  /* ================= 달력 ================= */
+    if (type === "주") {
+      return "주간";
+    }
+
+    if (type === "야") {
+      return "야간";
+    }
+
+    return "휴무";
+
+  }
 
 
-  function renderCalendar() {
+  /* =========================================================
+     저장 데이터
+  ========================================================= */
 
-    const year =
-      calendarDate.getFullYear();
+  function getEvents() {
 
-    const month =
-      calendarDate.getMonth();
+    return JSON.parse(
+      localStorage.getItem("calendarEvents") || "[]"
+    );
+
+  }
+
+
+  function saveEvents(events) {
+
+    localStorage.setItem(
+      "calendarEvents",
+      JSON.stringify(events)
+    );
+
+  }
+
+
+  function dateKey(date) {
+
+    const y = date.getFullYear();
+
+    const m =
+      String(date.getMonth() + 1)
+      .padStart(2, "0");
+
+    const d =
+      String(date.getDate())
+      .padStart(2, "0");
+
+    return `${y}-${m}-${d}`;
+
+  }
+
+
+  function getEventsForDate(date) {
+
+    const key = dateKey(date);
+
+    return getEvents().filter(
+      item => item.date === key
+    );
+
+  }
+
+
+  /* =========================================================
+     휴가 등록 화면
+  ========================================================= */
+
+  function openLeave() {
+
+    if (!settingsReady()) {
+
+      alert("먼저 개인 설정을 완료해주세요.");
+      openSettings();
+      return;
+
+    }
+
+    hideAllScreens();
+
+    document
+      .getElementById("leaveScreen")
+      .classList.remove("hidden");
+
+    document.getElementById(
+      "userSummary"
+    ).innerHTML = getUserSummary();
+
+    renderLeaveCalendar();
+
+  }
+
+
+  function changeMonth(value) {
+
+    calendarDate =
+      new Date(
+        calendarDate.getFullYear(),
+        calendarDate.getMonth() + value,
+        1
+      );
+
+    selectedDate = null;
+
+    renderLeaveCalendar();
+
+  }
+
+
+  function renderLeaveCalendar() {
+
+    renderCalendar(
+      calendarDate,
+      "calendarTitle",
+      "calendarGrid",
+      selectedDate,
+      function(date) {
+
+        selectedDate = date;
+
+        updateLeaveSelected();
+
+        renderLeaveCalendar();
+
+      }
+    );
+
+  }
+
+
+  function updateLeaveSelected() {
+
+    if (!selectedDate) {
+      return;
+    }
+
+    const work =
+      getWorkType(selectedDate);
+
+    document.getElementById(
+      "selectedDateText"
+    ).textContent =
+      `${selectedDate.getFullYear()}년 ` +
+      `${selectedDate.getMonth() + 1}월 ` +
+      `${selectedDate.getDate()}일`;
+
+    document.getElementById(
+      "selectedShiftText"
+    ).textContent =
+      `기본 근무 : ${workText(work)}`;
+
+    renderSelectedEvents(
+      selectedDate,
+      "selectedEvents"
+    );
+
+  }
+
+
+  function saveLeave() {
+
+    if (!selectedDate) {
+
+      alert("휴가 날짜를 선택해주세요.");
+      return;
+
+    }
+
+
+    const checked =
+      document.querySelector(
+        'input[name="leaveType"]:checked'
+      );
+
+
+    if (!checked) {
+
+      alert("휴가 종류를 선택해주세요.");
+      return;
+
+    }
+
+
+    const events = getEvents();
+
+
+    events.push({
+
+      id: Date.now(),
+
+      date: dateKey(selectedDate),
+
+      type: "휴가",
+
+      title: checked.value,
+
+      name:
+        localStorage.getItem("userName"),
+
+      shift:
+        localStorage.getItem("userShift"),
+
+      area:
+        localStorage.getItem("userArea"),
+
+      role:
+        localStorage.getItem("userRole")
+
+    });
+
+
+    saveEvents(events);
+
+
+    const message =
+      document.getElementById(
+        "leaveSavedMessage"
+      );
+
+    message.textContent =
+      `${dateKey(selectedDate)} ${checked.value} 등록 완료`;
+
+    message.style.display =
+      "block";
+
+
+    setTimeout(() => {
+
+      message.style.display =
+        "none";
+
+    }, 2500);
+
+
+    updateLeaveSelected();
+    renderLeaveCalendar();
+
+  }
+
+
+  /* =========================================================
+     근무달력
+  ========================================================= */
+
+  function openWorkCalendar() {
+
+    if (!settingsReady()) {
+
+      alert("먼저 개인 설정을 완료해주세요.");
+      openSettings();
+      return;
+
+    }
+
+
+    hideAllScreens();
+
+    document
+      .getElementById("workCalendarScreen")
+      .classList.remove("hidden");
 
 
     document.getElementById(
-      "calendarTitle"
+      "workUserSummary"
+    ).innerHTML = getUserSummary();
+
+
+    renderWorkCalendar();
+
+  }
+
+
+  function changeWorkMonth(value) {
+
+    workCalendarDate =
+      new Date(
+        workCalendarDate.getFullYear(),
+        workCalendarDate.getMonth() + value,
+        1
+      );
+
+    workSelectedDateValue = null;
+
+    renderWorkCalendar();
+
+  }
+
+
+  function renderWorkCalendar() {
+
+    renderCalendar(
+      workCalendarDate,
+      "workCalendarTitle",
+      "workCalendarGrid",
+      workSelectedDateValue,
+      function(date) {
+
+        workSelectedDateValue =
+          date;
+
+        updateWorkSelected();
+
+        renderWorkCalendar();
+
+      }
+    );
+
+  }
+
+
+  function updateWorkSelected() {
+
+    if (!workSelectedDateValue) {
+      return;
+    }
+
+
+    const work =
+      getWorkType(
+        workSelectedDateValue
+      );
+
+
+    document.getElementById(
+      "workSelectedDate"
+    ).textContent =
+      `${workSelectedDateValue.getFullYear()}년 ` +
+      `${workSelectedDateValue.getMonth() + 1}월 ` +
+      `${workSelectedDateValue.getDate()}일`;
+
+
+    document.getElementById(
+      "workSelectedShift"
+    ).textContent =
+      `기본 근무 : ${workText(work)}`;
+
+
+    renderSelectedEvents(
+      workSelectedDateValue,
+      "workSelectedEvents"
+    );
+
+  }
+
+
+  function saveExtraEvent() {
+
+    if (!workSelectedDateValue) {
+
+      alert("날짜를 먼저 선택해주세요.");
+      return;
+
+    }
+
+
+    const type =
+      document.getElementById(
+        "extraEventType"
+      ).value;
+
+
+    const hours =
+      document.getElementById(
+        "extraEventHours"
+      ).value;
+
+
+    const events = getEvents();
+
+
+    events.push({
+
+      id: Date.now(),
+
+      date:
+        dateKey(
+          workSelectedDateValue
+        ),
+
+      type: type,
+
+      title:
+        `${type} ${hours}h`,
+
+      hours:
+        Number(hours),
+
+      name:
+        localStorage.getItem(
+          "userName"
+        )
+
+    });
+
+
+    saveEvents(events);
+
+    renderWorkCalendar();
+
+    updateWorkSelected();
+
+    alert(`${type} 일정이 등록되었습니다.`);
+
+  }
+
+
+  /* =========================================================
+     공통 달력
+  ========================================================= */
+
+  function renderCalendar(
+    currentDate,
+    titleId,
+    gridId,
+    selected,
+    clickHandler
+  ) {
+
+    const year =
+      currentDate.getFullYear();
+
+    const month =
+      currentDate.getMonth();
+
+
+    document.getElementById(
+      titleId
     ).textContent =
       `${year}년 ${month + 1}월`;
 
 
     const firstDay =
-      new Date(year, month, 1)
-      .getDay();
+      new Date(
+        year,
+        month,
+        1
+      ).getDay();
 
 
     const lastDate =
@@ -797,7 +1341,7 @@
 
     const grid =
       document.getElementById(
-        "calendarGrid"
+        gridId
       );
 
 
@@ -817,6 +1361,7 @@
         "calendar-day empty";
 
       grid.appendChild(empty);
+
     }
 
 
@@ -834,47 +1379,51 @@
         );
 
 
-      const workType =
+      const work =
         getWorkType(date);
 
 
       const cell =
         document.createElement("div");
 
-
       cell.className =
         "calendar-day";
 
 
       if (
-        selectedDate &&
-        selectedDate.getFullYear() === year &&
-        selectedDate.getMonth() === month &&
-        selectedDate.getDate() === day
+        selected &&
+        selected.getFullYear() === year &&
+        selected.getMonth() === month &&
+        selected.getDate() === day
       ) {
 
         cell.classList.add(
           "selected"
         );
+
       }
 
 
-      let shiftClass = "";
+      let shiftClass =
+        "shift-off";
 
-      if (workType === "주") {
-        shiftClass = "shift-day";
+
+      if (work === "주") {
+
+        shiftClass =
+          "shift-day";
+
       }
 
-      else if (workType === "야") {
-        shiftClass = "shift-night";
+      else if (work === "야") {
+
+        shiftClass =
+          "shift-night";
+
       }
 
-      else {
-        shiftClass = "shift-off";
-      }
 
-
-      cell.innerHTML = `
+      let html = `
 
         <div class="day-number">
           ${day}
@@ -884,203 +1433,150 @@
           shift-label
           ${shiftClass}
         ">
-          ${workType}
+          ${work}
         </span>
 
       `;
 
 
+      const events =
+        getEventsForDate(date);
+
+
+      events.forEach(event => {
+
+        let eventClass =
+          "event-leave";
+
+
+        if (
+          event.type === "대근"
+        ) {
+
+          eventClass =
+            "event-daegun";
+
+        }
+
+
+        if (
+          event.type === "교육"
+        ) {
+
+          eventClass =
+            "event-education";
+
+        }
+
+
+        html += `
+
+          <span class="
+            event-badge
+            ${eventClass}
+          ">
+            ${event.title}
+          </span>
+
+        `;
+
+      });
+
+
+      cell.innerHTML = html;
+
+
       cell.onclick = () => {
 
-        selectedDate = date;
+        clickHandler(date);
 
-        selectedWork =
-          workType;
-
-        updateSelectedDate();
-
-        renderCalendar();
       };
 
 
       grid.appendChild(cell);
+
     }
+
   }
 
 
+  /* =========================================================
+     선택 날짜 일정 표시/삭제
+  ========================================================= */
 
-  function updateSelectedDate() {
+  function renderSelectedEvents(
+    date,
+    elementId
+  ) {
 
-    if (!selectedDate) {
-      return;
-    }
-
-
-    const year =
-      selectedDate.getFullYear();
-
-    const month =
-      selectedDate.getMonth() + 1;
-
-    const day =
-      selectedDate.getDate();
-
-
-    document.getElementById(
-      "selectedDateText"
-    ).textContent =
-      `${year}년 ${month}월 ${day}일`;
-
-
-    let text = "";
-
-
-    if (selectedWork === "주") {
-      text = "기본 근무 : 주간";
-    }
-
-    else if (selectedWork === "야") {
-      text = "기본 근무 : 야간";
-    }
-
-    else {
-      text = "기본 근무 : 휴무";
-    }
-
-
-    document.getElementById(
-      "selectedShiftText"
-    ).textContent = text;
-  }
-
-
-
-  function changeMonth(value) {
-
-    calendarDate =
-      new Date(
-        calendarDate.getFullYear(),
-        calendarDate.getMonth() + value,
-        1
-      );
-
-
-    renderCalendar();
-  }
-
-
-
-  /* ================= 휴가 저장 ================= */
-
-
-  function saveLeave() {
-
-    if (!selectedDate) {
-
-      alert(
-        "휴가 날짜를 선택해주세요."
-      );
-
-      return;
-    }
-
-
-    const checked =
-      document.querySelector(
-        'input[name="leaveType"]:checked'
-      );
-
-
-    if (!checked) {
-
-      alert(
-        "휴가 종류를 선택해주세요."
-      );
-
-      return;
-    }
-
-
-    const leaveType =
-      checked.value;
-
-
-    const leaveData = {
-
-      id: Date.now(),
-
-      date:
-        selectedDate
-          .toISOString()
-          .split("T")[0],
-
-      workType:
-        selectedWork,
-
-      leaveType:
-        leaveType,
-
-      name:
-        localStorage.getItem(
-          "userName"
-        ),
-
-      shift:
-        localStorage.getItem(
-          "userShift"
-        ),
-
-      area:
-        localStorage.getItem(
-          "userArea"
-        ),
-
-      role:
-        localStorage.getItem(
-          "userRole"
-        )
-    };
-
-
-    const existing =
-      JSON.parse(
-        localStorage.getItem(
-          "leaveRecords"
-        ) || "[]"
-      );
-
-
-    existing.push(
-      leaveData
-    );
-
-
-    localStorage.setItem(
-      "leaveRecords",
-      JSON.stringify(existing)
-    );
-
-
-    const message =
+    const area =
       document.getElementById(
-        "leaveSavedMessage"
+        elementId
       );
 
 
-    message.textContent =
-      `${leaveData.date} / ${leaveType} 등록되었습니다.`;
+    const events =
+      getEventsForDate(date);
 
 
-    message.style.display =
-      "block";
+    if (events.length === 0) {
+
+      area.innerHTML =
+        "<div style='color:#888;'>등록된 일정 없음</div>";
+
+      return;
+
+    }
 
 
-    setTimeout(() => {
+    area.innerHTML =
+      events.map(event => `
 
-      message.style.display =
-        "none";
+        <div class="event-row">
 
-    }, 2500);
+          <span>
+            ${event.title}
+          </span>
+
+          <button
+            class="delete-button"
+            onclick="deleteEvent(${event.id})"
+          >
+            삭제
+          </button>
+
+        </div>
+
+      `).join("");
+
+  }
+
+
+  function deleteEvent(id) {
+
+    let events =
+      getEvents();
+
+
+    events =
+      events.filter(
+        item => item.id !== id
+      );
+
+
+    saveEvents(events);
+
+
+    if (selectedDate) {
+      updateLeaveSelected();
+      renderLeaveCalendar();
+    }
+
+
+    if (workSelectedDateValue) {
+      updateWorkSelected();
+      renderWorkCalendar();
+    }
 
   }
 
