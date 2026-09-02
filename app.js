@@ -2,18 +2,11 @@
    달력 상태
 ========================================================= */
 
-let calendarDate =
-  new Date();
+let calendarDate = new Date();
+let selectedDate = null;
 
-let selectedDate =
-  null;
-
-
-let workCalendarDate =
-  new Date();
-
-let workSelectedDateValue =
-  null;
+let workCalendarDate = new Date();
+let workSelectedDateValue = null;
 
 
 
@@ -24,19 +17,14 @@ let workSelectedDateValue =
 ========================================================= */
 
 const shiftPattern = [
-
   "주",
   "주",
-
   "휴",
   "휴",
-
   "야",
   "야",
-
   "휴",
   "휴"
-
 ];
 
 
@@ -47,12 +35,11 @@ const shiftPattern = [
    2026년 12월 2일
 ========================================================= */
 
-const baseDate =
-  new Date(
-    2026,
-    11,
-    2
-  );
+const baseDate = new Date(
+  2026,
+  11,
+  2
+);
 
 
 
@@ -61,27 +48,54 @@ const baseDate =
 ========================================================= */
 
 const shiftOffsets = {
-
   "1조": 0,
-
   "2조": 6,
-
   "3조": 4,
-
   "4조": 2
-
 };
 
 
 
 /* =========================================================
-   정기보수 / 맞교대 등
-   특수 근무 변경용
+   정기보수 / 맞교대 등 특수 근무 변경
 
-   추후 Firebase로 관리 예정
+   나중에 Firebase로 관리 예정
 ========================================================= */
 
-const shiftOverrides = {
+const shiftOverrides = {};
+
+
+
+/* =========================================================
+   휴가 종류별 대근 규칙
+========================================================= */
+
+const leaveRules = {
+
+  "연차": {
+    requiredHours: 12,
+    availableClaimHours: [12, 8, 4]
+  },
+
+  "전반차": {
+    requiredHours: 4,
+    availableClaimHours: [4]
+  },
+
+  "후반차": {
+    requiredHours: 4,
+    availableClaimHours: [4]
+  },
+
+  "전반반차": {
+    requiredHours: 2,
+    availableClaimHours: [2]
+  },
+
+  "후반반차": {
+    requiredHours: 2,
+    availableClaimHours: [2]
+  }
 
 };
 
@@ -149,9 +163,7 @@ function getShiftChanges() {
 
 
 
-function saveShiftChanges(
-  changes
-) {
+function saveShiftChanges(changes) {
 
   localStorage.setItem(
 
@@ -171,9 +183,7 @@ function saveShiftChanges(
    특정 날짜의 실제 교대조 계산
 ========================================================= */
 
-function getShiftForDate(
-  date
-) {
+function getShiftForDate(date) {
 
   const baseShift =
     localStorage.getItem(
@@ -196,10 +206,7 @@ function getShiftForDate(
       .slice()
       .sort(
 
-        function (
-          a,
-          b
-        ) {
+        function(a, b) {
 
           return (
             a.effectiveDate
@@ -219,9 +226,7 @@ function getShiftForDate(
 
   changes.forEach(
 
-    function (
-      change
-    ) {
+    function(change) {
 
       if (
         change.effectiveDate
@@ -286,16 +291,14 @@ function addShiftChange() {
 
 
   /*
-    같은 날짜의 변경기록이 있다면
-    새 기록으로 교체
+    같은 날짜의 변경기록이 있으면
+    새 값으로 교체
   */
 
   changes =
     changes.filter(
 
-      function (
-        item
-      ) {
+      function(item) {
 
         return (
           item.effectiveDate
@@ -324,10 +327,7 @@ function addShiftChange() {
 
   changes.sort(
 
-    function (
-      a,
-      b
-    ) {
+    function(a, b) {
 
       return (
         a.effectiveDate
@@ -384,9 +384,7 @@ function addShiftChange() {
    교대조 변경 삭제
 ========================================================= */
 
-function deleteShiftChange(
-  id
-) {
+function deleteShiftChange(id) {
 
   let changes =
     getShiftChanges();
@@ -395,9 +393,7 @@ function deleteShiftChange(
   changes =
     changes.filter(
 
-      function (
-        item
-      ) {
+      function(item) {
 
         return (
           item.id !== id
@@ -422,7 +418,7 @@ function deleteShiftChange(
 
 
 /* =========================================================
-   교대조 변경 이력 표시
+   교대조 변경 이력 화면 표시
 ========================================================= */
 
 function renderShiftHistory() {
@@ -434,15 +430,17 @@ function renderShiftHistory() {
       );
 
 
+  if (!container) {
+    return;
+  }
+
+
   const changes =
     getShiftChanges()
       .slice()
       .sort(
 
-        function (
-          a,
-          b
-        ) {
+        function(a, b) {
 
           return (
             a.effectiveDate
@@ -463,9 +461,7 @@ function renderShiftHistory() {
     container.innerHTML = `
 
       <div class="shift-history-empty">
-
         등록된 교대조 변경 이력이 없습니다.
-
       </div>
 
     `;
@@ -480,9 +476,7 @@ function renderShiftHistory() {
 
     changes.map(
 
-      function (
-        change
-      ) {
+      function(change) {
 
         return `
 
@@ -503,9 +497,7 @@ function renderShiftHistory() {
               class="history-delete"
               onclick="deleteShiftChange(${change.id})"
             >
-
               삭제
-
             </button>
 
           </div>
@@ -521,12 +513,10 @@ function renderShiftHistory() {
 
 
 /* =========================================================
-   실제 기본 근무 계산
+   실제 근무 계산
 ========================================================= */
 
-function getWorkType(
-  date
-) {
+function getWorkType(date) {
 
   const shift =
     getShiftForDate(
@@ -542,7 +532,7 @@ function getWorkType(
 
   /*
     특수 근무표가 있으면
-    정상 교대패턴보다 우선
+    정상 패턴보다 우선 적용
   */
 
   if (
@@ -560,7 +550,6 @@ function getWorkType(
     );
 
   }
-
 
 
   const targetUTC =
@@ -651,9 +640,7 @@ function getWorkType(
    근무명 변환
 ========================================================= */
 
-function workText(
-  type
-) {
+function workText(type) {
 
   if (
     type === "주"
@@ -685,44 +672,41 @@ function workText(
 
 function hideAllScreens() {
 
-  document
-    .getElementById(
-      "homeScreen"
-    )
-    .classList
-    .add(
-      "hidden"
-    );
+  const ids = [
+    "homeScreen",
+    "settingsScreen",
+    "leaveScreen",
+    "daegunRequestScreen",
+    "workCalendarScreen"
+  ];
 
 
-  document
-    .getElementById(
-      "settingsScreen"
-    )
-    .classList
-    .add(
-      "hidden"
-    );
+  ids.forEach(
+
+    function(id) {
+
+      const screen =
+        document
+          .getElementById(
+            id
+          );
 
 
-  document
-    .getElementById(
-      "leaveScreen"
-    )
-    .classList
-    .add(
-      "hidden"
-    );
+      if (
+        screen
+      ) {
 
+        screen
+          .classList
+          .add(
+            "hidden"
+          );
 
-  document
-    .getElementById(
-      "workCalendarScreen"
-    )
-    .classList
-    .add(
-      "hidden"
-    );
+      }
+
+    }
+
+  );
 
 }
 
@@ -733,21 +717,31 @@ function goHome() {
   hideAllScreens();
 
 
-  document
-    .getElementById(
-      "homeScreen"
-    )
-    .classList
-    .remove(
-      "hidden"
-    );
+  const home =
+    document
+      .getElementById(
+        "homeScreen"
+      );
+
+
+  if (
+    home
+  ) {
+
+    home
+      .classList
+      .remove(
+        "hidden"
+      );
+
+  }
 
 }
 
 
 
 /* =========================================================
-   개인 설정 열기
+   개인 설정
 ========================================================= */
 
 function openSettings() {
@@ -829,19 +823,17 @@ function saveSettings() {
 
 
   localStorage.setItem(
-
     "userName",
-
     name
-
   );
 
 
   /*
-    최초 교대조가 아직 없는 경우만
-    기준 교대조로 저장
+    최초 기준 교대조는
+    처음 한 번만 저장한다.
 
-    이후에는 변경 이력으로 관리
+    이후 교대조 변경은
+    변경 이력으로 관리한다.
   */
 
   if (
@@ -851,31 +843,22 @@ function saveSettings() {
   ) {
 
     localStorage.setItem(
-
       "userShift",
-
       displayedShift
-
     );
 
   }
 
 
   localStorage.setItem(
-
     "userArea",
-
     area
-
   );
 
 
   localStorage.setItem(
-
     "userRole",
-
     role
-
   );
 
 
@@ -886,22 +869,28 @@ function saveSettings() {
       );
 
 
-  message.style.display =
-    "block";
+  if (
+    message
+  ) {
+
+    message.style.display =
+      "block";
 
 
-  setTimeout(
+    setTimeout(
 
-    function () {
+      function() {
 
-      message.style.display =
-        "none";
+        message.style.display =
+          "none";
 
-    },
+      },
 
-    2000
+      2000
 
-  );
+    );
+
+  }
 
 }
 
@@ -996,7 +985,7 @@ function loadSettings() {
 
 
 /* =========================================================
-   개인 설정 완료 여부
+   설정 완료 여부
 ========================================================= */
 
 function settingsReady() {
@@ -1082,7 +1071,7 @@ function getUserSummary() {
 
 
 /* =========================================================
-   일정 저장 데이터
+   일정 데이터
 ========================================================= */
 
 function getEvents() {
@@ -1103,9 +1092,7 @@ function getEvents() {
 
 
 
-function saveEvents(
-  events
-) {
+function saveEvents(events) {
 
   localStorage.setItem(
 
@@ -1121,9 +1108,7 @@ function saveEvents(
 
 
 
-function getEventsForDate(
-  date
-) {
+function getEventsForDate(date) {
 
   const key =
     dateKey(
@@ -1133,9 +1118,7 @@ function getEventsForDate(
 
   return getEvents().filter(
 
-    function (
-      item
-    ) {
+    function(item) {
 
       return (
         item.date === key
@@ -1150,7 +1133,127 @@ function getEventsForDate(
 
 
 /* =========================================================
-   휴가 등록 화면 열기
+   휴가 이벤트 정규화
+
+   예전에 저장된 데이터에도
+   대근시간 규칙을 자동 적용
+========================================================= */
+
+function normalizeLeaveEvent(event) {
+
+  if (
+    event.type !==
+    "휴가"
+  ) {
+
+    return event;
+
+  }
+
+
+  const rule =
+    leaveRules[
+      event.title
+    ];
+
+
+  if (
+    !event.requiredHours
+  ) {
+
+    event.requiredHours =
+      rule
+        ?
+        rule.requiredHours
+        :
+        0;
+
+  }
+
+
+  if (
+    !Array.isArray(
+      event.availableClaimHours
+    )
+  ) {
+
+    event.availableClaimHours =
+      rule
+        ?
+        rule.availableClaimHours
+        :
+        [];
+
+  }
+
+
+  if (
+    !Array.isArray(
+      event.claims
+    )
+  ) {
+
+    event.claims =
+      [];
+
+  }
+
+
+  event.claimedHours =
+    event.claims.reduce(
+
+      function(
+        sum,
+        claim
+      ) {
+
+        return (
+          sum +
+          Number(
+            claim.hours
+          )
+        );
+
+      },
+
+      0
+
+    );
+
+
+  event.remainingHours =
+    Math.max(
+
+      event.requiredHours
+      -
+      event.claimedHours,
+
+      0
+
+    );
+
+
+  event.status =
+
+    event.remainingHours === 0
+
+    ?
+
+    "완료"
+
+    :
+
+    "모집중";
+
+
+  return event;
+
+}
+
+
+
+/* =========================================================
+   휴가 등록 화면
 ========================================================= */
 
 function openLeave() {
@@ -1202,9 +1305,7 @@ function openLeave() {
    휴가 달력 월 변경
 ========================================================= */
 
-function changeMonth(
-  value
-) {
+function changeMonth(value) {
 
   calendarDate =
     new Date(
@@ -1233,7 +1334,7 @@ function changeMonth(
 
 
 /* =========================================================
-   휴가 달력 상세정보 초기화
+   휴가 달력 선택정보 초기화
 ========================================================= */
 
 function resetLeaveSelectedInfo() {
@@ -1274,7 +1375,7 @@ function resetLeaveSelectedInfo() {
 
 
 /* =========================================================
-   휴가 달력 그리기
+   휴가 달력 렌더링
 ========================================================= */
 
 function renderLeaveCalendar() {
@@ -1289,9 +1390,7 @@ function renderLeaveCalendar() {
 
     selectedDate,
 
-    function (
-      date
-    ) {
+    function(date) {
 
       selectedDate =
         date;
@@ -1447,6 +1546,30 @@ function saveLeave() {
   }
 
 
+  const leaveType =
+    checked.value;
+
+
+  const rule =
+    leaveRules[
+      leaveType
+    ];
+
+
+  if (
+    !rule
+  ) {
+
+    alert(
+      "휴가 종류 설정을 확인해주세요."
+    );
+
+
+    return;
+
+  }
+
+
   const events =
     getEvents();
 
@@ -1465,7 +1588,37 @@ function saveLeave() {
       "휴가",
 
     title:
-      checked.value,
+      leaveType,
+
+    /*
+      필요한 전체 대근시간
+    */
+
+    requiredHours:
+      rule.requiredHours,
+
+    /*
+      대근자가 선택할 수 있는 시간
+    */
+
+    availableClaimHours:
+      rule.availableClaimHours,
+
+    /*
+      대근자 목록
+    */
+
+    claims:
+      [],
+
+    claimedHours:
+      0,
+
+    remainingHours:
+      rule.requiredHours,
+
+    status:
+      "모집중",
 
     name:
       localStorage.getItem(
@@ -1502,43 +1655,952 @@ function saveLeave() {
       );
 
 
-  message.textContent =
+  if (
+    message
+  ) {
 
-    dateKey(
-      selectedDate
-    )
+    message.textContent =
 
-    +
-    " / "
+      dateKey(
+        selectedDate
+      )
 
-    +
-    checked.value
+      +
+      " / "
 
-    +
-    " 등록 완료";
+      +
+      leaveType
+
+      +
+      " / 대근 "
+
+      +
+      rule.requiredHours
+
+      +
+      "시간 필요";
 
 
-  message.style.display =
-    "block";
+    message.style.display =
+      "block";
 
 
-  setTimeout(
+    setTimeout(
 
-    function () {
+      function() {
 
-      message.style.display =
-        "none";
+        message.style.display =
+          "none";
 
-    },
+      },
 
-    2500
+      2500
 
-  );
+    );
+
+  }
+
+
+  /*
+    선택된 라디오 초기화
+  */
+
+  checked.checked =
+    false;
 
 
   updateLeaveSelected();
 
   renderLeaveCalendar();
+
+}
+
+
+
+/* =========================================================
+   대근 요청 화면
+========================================================= */
+
+function openDaegunRequests() {
+
+  if (
+    !settingsReady()
+  ) {
+
+    alert(
+      "먼저 개인 설정을 완료해주세요."
+    );
+
+
+    openSettings();
+
+    return;
+
+  }
+
+
+  hideAllScreens();
+
+
+  const screen =
+    document
+      .getElementById(
+        "daegunRequestScreen"
+      );
+
+
+  if (
+    !screen
+  ) {
+
+    alert(
+      "대근 요청 화면이 index.html에 아직 추가되지 않았습니다."
+    );
+
+    goHome();
+
+    return;
+
+  }
+
+
+  screen
+    .classList
+    .remove(
+      "hidden"
+    );
+
+
+  const summary =
+    document
+      .getElementById(
+        "daegunUserSummary"
+      );
+
+
+  if (
+    summary
+  ) {
+
+    summary.innerHTML =
+      getUserSummary();
+
+  }
+
+
+  renderDaegunRequests();
+
+}
+
+
+
+/* =========================================================
+   대근 요청 목록
+========================================================= */
+
+function renderDaegunRequests() {
+
+  const container =
+    document
+      .getElementById(
+        "daegunRequestList"
+      );
+
+
+  if (
+    !container
+  ) {
+
+    return;
+
+  }
+
+
+  let events =
+    getEvents();
+
+
+  let requests =
+    events
+
+      .filter(
+
+        function(event) {
+
+          return (
+            event.type ===
+            "휴가"
+          );
+
+        }
+
+      )
+
+      .map(
+
+        function(event) {
+
+          return (
+            normalizeLeaveEvent(
+              event
+            )
+          );
+
+        }
+
+      )
+
+      .sort(
+
+        function(a, b) {
+
+          return (
+            a.date
+              .localeCompare(
+                b.date
+              )
+          );
+
+        }
+
+      );
+
+
+  if (
+    requests.length === 0
+  ) {
+
+    container.innerHTML = `
+
+      <div class="no-request">
+        현재 등록된 대근 요청이 없습니다.
+      </div>
+
+    `;
+
+
+    return;
+
+  }
+
+
+  const currentName =
+    localStorage.getItem(
+      "userName"
+    );
+
+
+  container.innerHTML =
+
+    requests.map(
+
+      function(request) {
+
+        const isMyLeave =
+          request.name ===
+          currentName;
+
+
+        const myClaim =
+          request.claims.find(
+
+            function(claim) {
+
+              return (
+                claim.name ===
+                currentName
+              );
+
+            }
+
+          );
+
+
+        /*
+          남은 시간보다 큰 선택지는 제외
+        */
+
+        const availableButtons =
+          request
+            .availableClaimHours
+            .filter(
+
+              function(hours) {
+
+                return (
+                  hours <=
+                  request.remainingHours
+                );
+
+              }
+
+            );
+
+
+        let claimListHTML =
+          "";
+
+
+        if (
+          request.claims.length > 0
+        ) {
+
+          claimListHTML = `
+
+            <div class="claim-list">
+
+              <strong>
+                현재 대근자
+              </strong>
+
+              ${request.claims.map(
+
+                function(claim) {
+
+                  return `
+
+                    <div class="claim-row">
+
+                      <span>
+                        ${claim.name}
+                      </span>
+
+                      <span>
+                        ${claim.hours}시간
+                      </span>
+
+                    </div>
+
+                  `;
+
+                }
+
+              ).join("")}
+
+            </div>
+
+          `;
+
+        }
+
+
+        let actionHTML =
+          "";
+
+
+        /*
+          내가 올린 휴가는
+          내가 잡을 수 없음
+        */
+
+        if (
+          isMyLeave
+        ) {
+
+          if (
+            request.status ===
+            "완료"
+          ) {
+
+            actionHTML = `
+
+              <div class="request-complete">
+                대근 모집 완료
+              </div>
+
+            `;
+
+          }
+
+          else {
+
+            actionHTML = `
+
+              <div class="notice">
+                내가 등록한 휴가입니다.
+              </div>
+
+            `;
+
+          }
+
+        }
+
+
+        else if (
+          request.status ===
+          "완료"
+        ) {
+
+          actionHTML = `
+
+            <div class="request-complete">
+              대근 모집 완료
+            </div>
+
+          `;
+
+        }
+
+
+        else if (
+          myClaim
+        ) {
+
+          actionHTML = `
+
+            <div class="request-complete">
+
+              내가 ${myClaim.hours}시간 대근 예정
+
+            </div>
+
+
+            <button
+              class="cancel-claim-button"
+              onclick="cancelDaegunClaim(${request.id})"
+            >
+
+              내 대근 취소
+
+            </button>
+
+          `;
+
+        }
+
+
+        else if (
+          availableButtons.length === 0
+        ) {
+
+          actionHTML = `
+
+            <div class="request-complete">
+              선택 가능한 남은 시간이 없습니다.
+            </div>
+
+          `;
+
+        }
+
+
+        else {
+
+          actionHTML = `
+
+            <div class="claim-buttons">
+
+              ${availableButtons.map(
+
+                function(hours) {
+
+                  return `
+
+                    <button
+                      class="claim-button"
+                      onclick="claimDaegun(${request.id}, ${hours})"
+                    >
+
+                      ${hours}시간
+
+                    </button>
+
+                  `;
+
+                }
+
+              ).join("")}
+
+            </div>
+
+          `;
+
+        }
+
+
+        return `
+
+          <div
+            class="
+              request-card
+              ${
+                request.status ===
+                "완료"
+
+                ?
+
+                "complete"
+
+                :
+
+                ""
+              }
+            "
+          >
+
+            <div class="request-date">
+
+              ${formatRequestDate(
+                request.date
+              )}
+
+            </div>
+
+
+            <div class="request-person">
+
+              ${request.name}
+
+            </div>
+
+
+            <div class="request-info">
+
+              ${request.shift}
+              ·
+              ${request.area}
+              ·
+              ${request.role}
+
+              <br>
+
+              휴가 :
+              ${request.title}
+
+            </div>
+
+
+            <div class="request-hours">
+
+              필요 :
+              <strong>
+                ${request.requiredHours}시간
+              </strong>
+
+              <br>
+
+              잡힌 시간 :
+              ${request.claimedHours}시간
+
+              <br>
+
+              남은 시간 :
+              <strong>
+                ${request.remainingHours}시간
+              </strong>
+
+              ${claimListHTML}
+
+            </div>
+
+
+            ${actionHTML}
+
+          </div>
+
+        `;
+
+      }
+
+    ).join("");
+
+
+  /*
+    예전 휴가 데이터도
+    새 구조로 보정해서 다시 저장
+  */
+
+  const normalizedEvents =
+    events.map(
+
+      function(event) {
+
+        if (
+          event.type ===
+          "휴가"
+        ) {
+
+          return (
+            normalizeLeaveEvent(
+              event
+            )
+          );
+
+        }
+
+
+        return event;
+
+      }
+
+    );
+
+
+  saveEvents(
+    normalizedEvents
+  );
+
+}
+
+
+
+/* =========================================================
+   대근 요청 날짜 표시
+========================================================= */
+
+function formatRequestDate(
+  dateString
+) {
+
+  const parts =
+    dateString.split(
+      "-"
+    );
+
+
+  return (
+
+    Number(
+      parts[0]
+    )
+
+    +
+    "년 "
+
+    +
+
+    Number(
+      parts[1]
+    )
+
+    +
+    "월 "
+
+    +
+
+    Number(
+      parts[2]
+    )
+
+    +
+    "일"
+
+  );
+
+}
+
+
+
+/* =========================================================
+   대근 잡기
+========================================================= */
+
+function claimDaegun(
+  requestId,
+  hours
+) {
+
+  const currentName =
+    localStorage.getItem(
+      "userName"
+    );
+
+
+  let events =
+    getEvents();
+
+
+  const index =
+    events.findIndex(
+
+      function(event) {
+
+        return (
+          event.id ===
+          requestId
+        );
+
+      }
+
+    );
+
+
+  if (
+    index === -1
+  ) {
+
+    return;
+
+  }
+
+
+  let request =
+    normalizeLeaveEvent(
+      events[index]
+    );
+
+
+  /*
+    본인 휴가는 본인이 잡지 못함
+  */
+
+  if (
+    request.name ===
+    currentName
+  ) {
+
+    alert(
+      "본인이 등록한 휴가는 직접 대근할 수 없습니다."
+    );
+
+
+    return;
+
+  }
+
+
+  /*
+    동일한 사람이 같은 요청을
+    두 번 잡지 못하도록 처리
+  */
+
+  const alreadyClaimed =
+    request.claims.some(
+
+      function(claim) {
+
+        return (
+          claim.name ===
+          currentName
+        );
+
+      }
+
+    );
+
+
+  if (
+    alreadyClaimed
+  ) {
+
+    alert(
+      "이미 이 대근을 신청했습니다."
+    );
+
+
+    return;
+
+  }
+
+
+  if (
+    hours >
+    request.remainingHours
+  ) {
+
+    alert(
+      "남은 대근시간보다 많이 신청할 수 없습니다."
+    );
+
+
+    return;
+
+  }
+
+
+  /*
+    해당 요청에서 허용되는 시간인지 확인
+  */
+
+  if (
+    !request.availableClaimHours.includes(
+      hours
+    )
+  ) {
+
+    alert(
+      "선택할 수 없는 대근시간입니다."
+    );
+
+
+    return;
+
+  }
+
+
+  request.claims.push({
+
+    id:
+      Date.now(),
+
+    name:
+      currentName,
+
+    hours:
+      Number(
+        hours
+      )
+
+  });
+
+
+  request =
+    normalizeLeaveEvent(
+      request
+    );
+
+
+  events[index] =
+    request;
+
+
+  saveEvents(
+    events
+  );
+
+
+  renderDaegunRequests();
+
+
+  /*
+    달력도 즉시 갱신
+  */
+
+  if (
+    selectedDate
+  ) {
+
+    updateLeaveSelected();
+
+    renderLeaveCalendar();
+
+  }
+
+
+  if (
+    workSelectedDateValue
+  ) {
+
+    updateWorkSelected();
+
+    renderWorkCalendar();
+
+  }
+
+
+  alert(
+
+    hours +
+    "시간 대근으로 등록되었습니다."
+
+  );
+
+}
+
+
+
+/* =========================================================
+   내가 잡은 대근 취소
+========================================================= */
+
+function cancelDaegunClaim(
+  requestId
+) {
+
+  const currentName =
+    localStorage.getItem(
+      "userName"
+    );
+
+
+  let events =
+    getEvents();
+
+
+  const index =
+    events.findIndex(
+
+      function(event) {
+
+        return (
+          event.id ===
+          requestId
+        );
+
+      }
+
+    );
+
+
+  if (
+    index === -1
+  ) {
+
+    return;
+
+  }
+
+
+  let request =
+    normalizeLeaveEvent(
+      events[index]
+    );
+
+
+  request.claims =
+    request.claims.filter(
+
+      function(claim) {
+
+        return (
+          claim.name !==
+          currentName
+        );
+
+      }
+
+    );
+
+
+  request =
+    normalizeLeaveEvent(
+      request
+    );
+
+
+  events[index] =
+    request;
+
+
+  saveEvents(
+    events
+  );
+
+
+  renderDaegunRequests();
+
+
+  if (
+    selectedDate
+  ) {
+
+    updateLeaveSelected();
+
+    renderLeaveCalendar();
+
+  }
+
+
+  if (
+    workSelectedDateValue
+  ) {
+
+    updateWorkSelected();
+
+    renderWorkCalendar();
+
+  }
 
 }
 
@@ -1597,9 +2659,7 @@ function openWorkCalendar() {
    근무 달력 월 변경
 ========================================================= */
 
-function changeWorkMonth(
-  value
-) {
+function changeWorkMonth(value) {
 
   workCalendarDate =
     new Date(
@@ -1669,7 +2729,7 @@ function resetWorkSelectedInfo() {
 
 
 /* =========================================================
-   근무 달력 그리기
+   근무 달력 렌더링
 ========================================================= */
 
 function renderWorkCalendar() {
@@ -1684,9 +2744,7 @@ function renderWorkCalendar() {
 
     workSelectedDateValue,
 
-    function (
-      date
-    ) {
+    function(date) {
 
       workSelectedDateValue =
         date;
@@ -1804,7 +2862,7 @@ function updateWorkSelected() {
 
 
 /* =========================================================
-   테스트용 대근 / 교육
+   테스트용 대근 / 교육 일정
 ========================================================= */
 
 function saveExtraEvent() {
@@ -1912,8 +2970,7 @@ function saveExtraEvent() {
 
   alert(
 
-    type
-    +
+    type +
     " 일정이 등록되었습니다."
 
   );
@@ -1923,7 +2980,7 @@ function saveExtraEvent() {
 
 
 /* =========================================================
-   공통 달력 생성
+   공통 달력
 ========================================================= */
 
 function renderCalendar(
@@ -2007,9 +3064,10 @@ function renderCalendar(
   ) {
 
     const empty =
-      document.createElement(
-        "div"
-      );
+      document
+        .createElement(
+          "div"
+        );
 
 
     empty.className =
@@ -2048,9 +3106,10 @@ function renderCalendar(
 
 
     const cell =
-      document.createElement(
-        "div"
-      );
+      document
+        .createElement(
+          "div"
+        );
 
 
     cell.className =
@@ -2081,9 +3140,11 @@ function renderCalendar(
 
     ) {
 
-      cell.classList.add(
-        "selected"
-      );
+      cell
+        .classList
+        .add(
+          "selected"
+        );
 
     }
 
@@ -2132,9 +3193,7 @@ function renderCalendar(
 
     events.forEach(
 
-      function (
-        event
-      ) {
+      function(event) {
 
         let eventClass =
           "event-leave";
@@ -2181,7 +3240,7 @@ function renderCalendar(
 
     cell.onclick =
 
-      function () {
+      function() {
 
         clickHandler(
           date
@@ -2201,7 +3260,10 @@ function renderCalendar(
 
 
 /* =========================================================
-   선택 날짜 일정 표시
+   선택된 날짜 일정 상세
+
+   휴가자의 경우
+   대근자의 시간은 숨기고 이름만 표시
 ========================================================= */
 
 function renderSelectedEvents(
@@ -2247,9 +3309,101 @@ function renderSelectedEvents(
 
     events.map(
 
-      function (
-        event
-      ) {
+      function(event) {
+
+        /*
+          휴가
+        */
+
+        if (
+          event.type ===
+          "휴가"
+        ) {
+
+          const request =
+            normalizeLeaveEvent(
+              event
+            );
+
+
+          const names =
+            request.claims.map(
+
+              function(claim) {
+
+                return (
+                  claim.name
+                );
+
+              }
+
+            );
+
+
+          const uniqueNames =
+            [...new Set(
+              names
+            )];
+
+
+          const daegunText =
+
+            uniqueNames.length > 0
+
+            ?
+
+            "대근자 : "
+            +
+            uniqueNames.join(
+              ", "
+            )
+
+            :
+
+            "대근자 : 아직 없음";
+
+
+          return `
+
+            <div class="event-row">
+
+              <span>
+
+                <strong>
+                  ${request.title}
+                </strong>
+
+                <br>
+
+                <span
+                  style="
+                    color:#666;
+                    font-size:12px;
+                  "
+                >
+                  ${daegunText}
+                </span>
+
+              </span>
+
+
+              <button
+                class="delete-button"
+                onclick="deleteEvent(${request.id})"
+              >
+                삭제
+              </button>
+
+            </div>
+
+          `;
+
+        }
+
+
+        /*
+          교육 / 테스트 대근 등
+        */
 
         return `
 
@@ -2283,9 +3437,7 @@ function renderSelectedEvents(
    일정 삭제
 ========================================================= */
 
-function deleteEvent(
-  id
-) {
+function deleteEvent(id) {
 
   let events =
     getEvents();
@@ -2294,9 +3446,7 @@ function deleteEvent(
   events =
     events.filter(
 
-      function (
-        item
-      ) {
+      function(item) {
 
         return (
           item.id !== id
@@ -2333,15 +3483,36 @@ function deleteEvent(
 
   }
 
+
+  const requestScreen =
+    document
+      .getElementById(
+        "daegunRequestScreen"
+      );
+
+
+  if (
+    requestScreen &&
+    !requestScreen
+      .classList
+      .contains(
+        "hidden"
+      )
+  ) {
+
+    renderDaegunRequests();
+
+  }
+
 }
 
 
 
 /* =========================================================
-   날짜 관련 화면 갱신
+   실제 날짜 관련 화면 갱신
 
-   실제 날짜가 바뀌면
-   현재 교대조도 다시 계산
+   교대조 변경 적용일이나
+   자정이 지났을 때 사용
 ========================================================= */
 
 function refreshDateSensitiveUI() {
@@ -2354,6 +3525,10 @@ function refreshDateSensitiveUI() {
 
 
   if (
+
+    settingsScreen
+
+    &&
 
     !settingsScreen
       .classList
@@ -2411,6 +3586,23 @@ function refreshDateSensitiveUI() {
 
     }
 
+
+    const daegunUserSummary =
+      document
+        .getElementById(
+          "daegunUserSummary"
+        );
+
+
+    if (
+      daegunUserSummary
+    ) {
+
+      daegunUserSummary.innerHTML =
+        summary;
+
+    }
+
   }
 
 
@@ -2422,6 +3614,10 @@ function refreshDateSensitiveUI() {
 
 
   if (
+
+    leaveScreen
+
+    &&
 
     !leaveScreen
       .classList
@@ -2445,6 +3641,10 @@ function refreshDateSensitiveUI() {
 
   if (
 
+    workScreen
+
+    &&
+
     !workScreen
       .classList
       .contains(
@@ -2454,6 +3654,32 @@ function refreshDateSensitiveUI() {
   ) {
 
     renderWorkCalendar();
+
+  }
+
+
+  const requestScreen =
+    document
+      .getElementById(
+        "daegunRequestScreen"
+      );
+
+
+  if (
+
+    requestScreen
+
+    &&
+
+    !requestScreen
+      .classList
+      .contains(
+        "hidden"
+      )
+
+  ) {
+
+    renderDaegunRequests();
 
   }
 
@@ -2497,14 +3723,10 @@ function scheduleMidnightRefresh() {
 
   setTimeout(
 
-    function () {
+    function() {
 
       refreshDateSensitiveUI();
 
-
-      /*
-        다음 자정도 다시 예약
-      */
 
       scheduleMidnightRefresh();
 
@@ -2519,17 +3741,14 @@ function scheduleMidnightRefresh() {
 
 
 /* =========================================================
-   앱이 다시 활성화될 때 갱신
-
-   휴대폰이 밤새 잠들어 있어도
-   다시 앱을 열면 현재 날짜를 재확인
+   앱이 다시 활성화됐을 때 갱신
 ========================================================= */
 
 document.addEventListener(
 
   "visibilitychange",
 
-  function () {
+  function() {
 
     if (
 
@@ -2553,7 +3772,7 @@ window.addEventListener(
 
   "focus",
 
-  function () {
+  function() {
 
     refreshDateSensitiveUI();
 

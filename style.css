@@ -708,4 +708,185 @@ body {
     font-size: 10px;
   }
 
+}/* =========================================
+   대근 요청
+========================================= */
+
+.request-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+
+.request-card {
+  background: white;
+
+  border-radius: 16px;
+
+  padding: 18px;
+
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+
+.request-card.complete {
+  opacity: 0.75;
+}
+
+
+.request-date {
+  font-size: 18px;
+  font-weight: bold;
+
+  margin-bottom: 12px;
+}
+
+
+.request-person {
+  font-size: 15px;
+  font-weight: bold;
+
+  margin-bottom: 4px;
+}
+
+
+.request-info {
+  font-size: 13px;
+
+  color: #666;
+
+  line-height: 1.7;
+
+  margin-bottom: 14px;
+}
+
+
+.request-hours {
+  background: #f7f8fa;
+
+  border-radius: 12px;
+
+  padding: 12px;
+
+  margin-bottom: 14px;
+
+  font-size: 13px;
+
+  line-height: 1.8;
+}
+
+
+.request-hours strong {
+  font-size: 15px;
+}
+
+
+.claim-list {
+  margin-top: 10px;
+
+  padding-top: 10px;
+
+  border-top: 1px solid #eee;
+}
+
+
+.claim-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 5px 0;
+
+  font-size: 13px;
+}
+
+
+.claim-buttons {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 8px;
+}
+
+
+.claim-button {
+  border: none;
+
+  border-radius: 10px;
+
+  padding: 11px 4px;
+
+  background: #222;
+
+  color: white;
+
+  font-size: 13px;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+
+.claim-button:disabled {
+  background: #ccc;
+
+  cursor: default;
+}
+
+
+.cancel-claim-button {
+  width: 100%;
+
+  margin-top: 10px;
+
+  padding: 10px;
+
+  border: 1px solid #ccc;
+
+  border-radius: 10px;
+
+  background: white;
+
+  font-size: 13px;
+
+  cursor: pointer;
+}
+
+
+.request-complete {
+  padding: 11px;
+
+  border-radius: 10px;
+
+  background: #d3f9d8;
+
+  color: #187b2f;
+
+  font-weight: bold;
+
+  text-align: center;
+
+  font-size: 14px;
+}
+
+
+.no-request {
+  background: white;
+
+  border-radius: 16px;
+
+  padding: 30px 20px;
+
+  text-align: center;
+
+  color: #777;
+
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.08);
 }

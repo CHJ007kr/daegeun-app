@@ -11,7 +11,6 @@
 
   <title>대근 관리 앱</title>
 
-  <!-- 디자인 파일 -->
   <link
     rel="stylesheet"
     href="./style.css"
@@ -38,10 +37,13 @@
 
     <div class="menu">
 
+      <!-- 휴가 등록 -->
+
       <div
         class="menu-card"
         onclick="openLeave()"
       >
+
         <div class="icon">
           🌴
         </div>
@@ -53,13 +55,39 @@
         <p>
           휴가를 등록하고 대근 요청을 생성합니다.
         </p>
+
       </div>
 
+
+      <!-- 대근 요청 -->
+
+      <div
+        class="menu-card"
+        onclick="openDaegunRequests()"
+      >
+
+        <div class="icon">
+          🙋
+        </div>
+
+        <h2>
+          대근 요청
+        </h2>
+
+        <p>
+          등록된 대근 요청을 확인하고 가능한 시간을 선택합니다.
+        </p>
+
+      </div>
+
+
+      <!-- 근무 달력 -->
 
       <div
         class="menu-card"
         onclick="openWorkCalendar()"
       >
+
         <div class="icon">
           📅
         </div>
@@ -71,13 +99,17 @@
         <p>
           주간 · 야간 · 휴무 · 대근 · 교육 일정을 확인합니다.
         </p>
+
       </div>
 
+
+      <!-- 개인 설정 -->
 
       <div
         class="menu-card"
         onclick="openSettings()"
       >
+
         <div class="icon">
           ⚙️
         </div>
@@ -89,6 +121,7 @@
         <p>
           개인 근무정보와 교대조 변경 이력을 설정합니다.
         </p>
+
       </div>
 
     </div>
@@ -98,7 +131,7 @@
 
 
   <!-- =====================================================
-       개인 설정
+       개인 설정 화면
   ====================================================== -->
 
   <div
@@ -115,11 +148,15 @@
 
 
     <div class="header">
-      <h1>개인 설정</h1>
+
+      <h1>
+        개인 설정
+      </h1>
 
       <p>
         내 근무 정보를 설정합니다.
       </p>
+
     </div>
 
 
@@ -177,7 +214,7 @@
           현재 날짜 기준 교대조가 자동으로 표시됩니다.
 
           교대조가 변경되는 경우 아래의
-          '교대조 변경'에서 적용 시작일을 등록하세요.
+          교대조 변경에서 적용 시작일을 등록하세요.
 
         </div>
 
@@ -261,9 +298,7 @@
 
 
 
-    <!-- ===================================================
-         교대조 변경
-    ==================================================== -->
+    <!-- 교대조 변경 -->
 
     <div class="form-card">
 
@@ -354,7 +389,7 @@
 
 
   <!-- =====================================================
-       휴가 등록
+       휴가 등록 화면
   ====================================================== -->
 
   <div
@@ -419,33 +454,13 @@
 
       <div class="weekdays">
 
-        <div class="weekday">
-          일
-        </div>
-
-        <div class="weekday">
-          월
-        </div>
-
-        <div class="weekday">
-          화
-        </div>
-
-        <div class="weekday">
-          수
-        </div>
-
-        <div class="weekday">
-          목
-        </div>
-
-        <div class="weekday">
-          금
-        </div>
-
-        <div class="weekday">
-          토
-        </div>
+        <div class="weekday">일</div>
+        <div class="weekday">월</div>
+        <div class="weekday">화</div>
+        <div class="weekday">수</div>
+        <div class="weekday">목</div>
+        <div class="weekday">금</div>
+        <div class="weekday">토</div>
 
       </div>
 
@@ -485,6 +500,8 @@
 
 
 
+    <!-- 휴가 종류 -->
+
     <div class="form-card">
 
       <h2 class="section-title">
@@ -504,7 +521,17 @@
           >
 
           <span>
-            연차
+
+            <strong>
+              연차
+            </strong>
+
+            <br>
+
+            <small>
+              하계휴가, 경조사 등 · 12시간
+            </small>
+
           </span>
 
         </label>
@@ -520,7 +547,17 @@
           >
 
           <span>
-            전반차
+
+            <strong>
+              전반차
+            </strong>
+
+            <br>
+
+            <small>
+              4시간
+            </small>
+
           </span>
 
         </label>
@@ -536,7 +573,17 @@
           >
 
           <span>
-            후반차
+
+            <strong>
+              후반차
+            </strong>
+
+            <br>
+
+            <small>
+              4시간
+            </small>
+
           </span>
 
         </label>
@@ -548,11 +595,21 @@
           <input
             type="radio"
             name="leaveType"
-            value="전반반차(2시간)"
+            value="전반반차"
           >
 
           <span>
-            전반반차 (2시간)
+
+            <strong>
+              전반반차
+            </strong>
+
+            <br>
+
+            <small>
+              2시간
+            </small>
+
           </span>
 
         </label>
@@ -564,11 +621,21 @@
           <input
             type="radio"
             name="leaveType"
-            value="후반반차(2시간)"
+            value="후반반차"
           >
 
           <span>
-            후반반차 (2시간)
+
+            <strong>
+              후반반차
+            </strong>
+
+            <br>
+
+            <small>
+              2시간
+            </small>
+
           </span>
 
         </label>
@@ -609,7 +676,52 @@
 
 
   <!-- =====================================================
-       근무 달력
+       대근 요청 화면
+  ====================================================== -->
+
+  <div
+    id="daegunRequestScreen"
+    class="hidden"
+  >
+
+    <button
+      class="back-button"
+      onclick="goHome()"
+    >
+      ← 돌아가기
+    </button>
+
+
+    <div class="header">
+
+      <h1>
+        대근 요청
+      </h1>
+
+      <p>
+        가능한 대근 요청을 확인하고 근무 시간을 선택합니다.
+      </p>
+
+    </div>
+
+
+    <div
+      id="daegunUserSummary"
+      class="user-summary"
+    ></div>
+
+
+    <div
+      id="daegunRequestList"
+      class="request-list"
+    ></div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       근무 달력 화면
   ====================================================== -->
 
   <div
@@ -674,43 +786,21 @@
 
       <div class="weekdays">
 
-        <div class="weekday">
-          일
-        </div>
-
-        <div class="weekday">
-          월
-        </div>
-
-        <div class="weekday">
-          화
-        </div>
-
-        <div class="weekday">
-          수
-        </div>
-
-        <div class="weekday">
-          목
-        </div>
-
-        <div class="weekday">
-          금
-        </div>
-
-        <div class="weekday">
-          토
-        </div>
+        <div class="weekday">일</div>
+        <div class="weekday">월</div>
+        <div class="weekday">화</div>
+        <div class="weekday">수</div>
+        <div class="weekday">목</div>
+        <div class="weekday">금</div>
+        <div class="weekday">토</div>
 
       </div>
-
 
 
       <div
         id="workCalendarGrid"
         class="calendar-grid"
       ></div>
-
 
 
       <div class="selected-info">
@@ -808,10 +898,10 @@
 
   </div>
 
+
 </div>
 
 
-<!-- 기능 파일 -->
 <script src="./app.js"></script>
 
 </body>
