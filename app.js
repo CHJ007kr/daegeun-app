@@ -5792,6 +5792,19 @@ function deleteEvent(id) {
 
 
     if (
+      event.cancelled === true
+    ) {
+
+      alert(
+        "이미 취소된 휴가입니다."
+      );
+
+      return;
+
+    }
+
+
+    if (
       event.date < dateKey(new Date())
     ) {
 
@@ -5804,19 +5817,66 @@ function deleteEvent(id) {
     }
 
 
+    const request =
+      normalizeLeaveEvent(
+        event
+      );
+
+
+    const affectedClaims =
+      request.claims.map(
+
+        function(claim) {
+
+          return Object.assign(
+            {},
+            claim
+          );
+
+        }
+
+      );
+
+
+    const confirmMessage =
+      affectedClaims.length > 0
+      ?
+      "현재 대근자가 등록되어 있습니다. 휴가를 취소하면 대근 일정도 함께 취소됩니다. 계속하시겠습니까?"
+      :
+      "이 휴가를 취소하시겠습니까?";
+
+
+    if (
+      !confirm(
+        confirmMessage
+      )
+    ) {
+
+      return;
+
+    }
+
+
     /*
-      휴가 취소 뒤에도 기존 claims를 유지해야
-      대근자의 근무 달력 기록이 사라지지 않는다.
+      향후 취소 알림 대상은 cancelledClaims에 보관하고,
+      활성 claims는 비워 현재 대근 일정에서 제거한다.
     */
 
     events[index] =
       Object.assign(
         {},
-        event,
+        request,
         {
           cancelled: true,
           cancelledAt:
-            new Date().toISOString()
+            new Date().toISOString(),
+          cancelledClaims:
+            affectedClaims,
+          claims: [],
+          claimedHours: 0,
+          remainingHours:
+            request.requiredHours,
+          status: "취소"
         }
       );
 
