@@ -43,10 +43,6 @@
       font-size: 14px;
     }
 
-    /* =========================
-       메인 메뉴
-    ========================= */
-
     .menu {
       display: flex;
       flex-direction: column;
@@ -80,10 +76,6 @@
       font-size: 28px;
       margin-bottom: 10px;
     }
-
-    /* =========================
-       버튼 / 카드
-    ========================= */
 
     .back-button {
       border: none;
@@ -140,6 +132,18 @@
       transform: scale(0.99);
     }
 
+    .secondary-button {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      background: white;
+      color: #222;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
     .saved-message {
       display: none;
       margin-top: 14px;
@@ -155,6 +159,61 @@
       border-radius: 12px;
       font-size: 13px;
       line-height: 1.7;
+    }
+
+    .sub-title {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .sub-description {
+      margin: 0 0 18px;
+      font-size: 13px;
+      color: #777;
+      line-height: 1.6;
+    }
+
+    /* =========================
+       교대조 변경 이력
+    ========================= */
+
+    .shift-history {
+      margin-top: 18px;
+    }
+
+    .shift-history-title {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .shift-history-empty {
+      font-size: 13px;
+      color: #888;
+      padding: 10px 0;
+    }
+
+    .shift-history-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 13px;
+    }
+
+    .shift-history-row:last-child {
+      border-bottom: none;
+    }
+
+    .history-delete {
+      border: none;
+      padding: 6px 8px;
+      border-radius: 7px;
+      background: #f1f3f5;
+      font-size: 12px;
+      cursor: pointer;
     }
 
     /* =========================
@@ -230,10 +289,6 @@
       margin-bottom: 5px;
     }
 
-    /* =========================
-       기본 근무 표시
-    ========================= */
-
     .shift-label {
       display: inline-block;
       font-size: 11px;
@@ -257,10 +312,6 @@
       background: #e9ecef;
       color: #666;
     }
-
-    /* =========================
-       일정 표시
-    ========================= */
 
     .event-badge {
       display: block;
@@ -290,10 +341,6 @@
       color: #6741d9;
     }
 
-    /* =========================
-       선택 날짜 정보
-    ========================= */
-
     .selected-info {
       margin-top: 16px;
       padding: 14px;
@@ -307,15 +354,17 @@
       margin-bottom: 6px;
     }
 
+    .selected-shift-info {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #777;
+    }
+
     .selected-event-list {
       margin-top: 8px;
       font-size: 13px;
       line-height: 1.7;
     }
-
-    /* =========================
-       휴가 종류
-    ========================= */
 
     .section-title {
       margin: 0 0 14px;
@@ -378,7 +427,7 @@
 
 
   <!-- =====================================================
-       메인 화면
+       메인
   ====================================================== -->
 
   <div id="homeScreen">
@@ -405,12 +454,13 @@
       <div class="menu-card" onclick="openSettings()">
         <div class="icon">⚙️</div>
         <h2>개인 설정</h2>
-        <p>이름 · 교대조 · 근무지역 · 근무 역할을 설정합니다.</p>
+        <p>개인 근무정보와 교대조 변경 이력을 설정합니다.</p>
       </div>
 
     </div>
 
   </div>
+
 
 
   <!-- =====================================================
@@ -419,10 +469,7 @@
 
   <div id="settingsScreen" class="hidden">
 
-    <button
-      class="back-button"
-      onclick="goHome()"
-    >
+    <button class="back-button" onclick="goHome()">
       ← 돌아가기
     </button>
 
@@ -430,6 +477,7 @@
       <h1>개인 설정</h1>
       <p>내 근무 정보를 설정합니다.</p>
     </div>
+
 
     <div class="form-card">
 
@@ -445,7 +493,7 @@
 
 
       <div class="form-group">
-        <label>교대조</label>
+        <label>기본 교대조</label>
 
         <select id="shift">
           <option value="">선택하세요</option>
@@ -454,6 +502,12 @@
           <option value="3조">3조</option>
           <option value="4조">4조</option>
         </select>
+
+        <div class="notice">
+          처음 근무하던 교대조를 선택합니다.
+          이후 교대조 변경은 아래의
+          '교대조 변경' 기능에서 등록합니다.
+        </div>
       </div>
 
 
@@ -485,7 +539,7 @@
         class="save-button"
         onclick="saveSettings()"
       >
-        저장하기
+        기본 정보 저장하기
       </button>
 
 
@@ -498,7 +552,67 @@
 
     </div>
 
+
+    <!-- 교대조 변경 -->
+
+    <div class="form-card">
+
+      <h2 class="sub-title">
+        교대조 변경
+      </h2>
+
+      <p class="sub-description">
+        교대조가 변경된 경우
+        변경된 조와 적용 시작일을 등록하세요.
+        해당 날짜부터 근무 달력이 자동으로 변경됩니다.
+      </p>
+
+
+      <div class="form-group">
+        <label>변경 후 교대조</label>
+
+        <select id="changeShift">
+          <option value="">선택하세요</option>
+          <option value="1조">1조</option>
+          <option value="2조">2조</option>
+          <option value="3조">3조</option>
+          <option value="4조">4조</option>
+        </select>
+      </div>
+
+
+      <div class="form-group">
+        <label>적용 시작일</label>
+
+        <input
+          type="date"
+          id="changeShiftDate"
+        >
+      </div>
+
+
+      <button
+        class="secondary-button"
+        onclick="addShiftChange()"
+      >
+        교대조 변경 등록
+      </button>
+
+
+      <div class="shift-history">
+
+        <div class="shift-history-title">
+          교대조 변경 이력
+        </div>
+
+        <div id="shiftHistoryList"></div>
+
+      </div>
+
+    </div>
+
   </div>
+
 
 
   <!-- =====================================================
@@ -507,10 +621,7 @@
 
   <div id="leaveScreen" class="hidden">
 
-    <button
-      class="back-button"
-      onclick="goHome()"
-    >
+    <button class="back-button" onclick="goHome()">
       ← 돌아가기
     </button>
 
@@ -578,6 +689,11 @@
         <span id="selectedShiftText">
           달력에서 날짜를 눌러주세요.
         </span>
+
+        <div
+          id="selectedShiftInfo"
+          class="selected-shift-info"
+        ></div>
 
         <div
           id="selectedEvents"
@@ -668,15 +784,9 @@
 
 
       <div class="notice">
-
-        현재는 테스트 단계이므로
-        이 기기에만 저장됩니다.
-
-        Firebase 연결 후에는
-        휴가 등록 시 조건에 맞는
-        팀원들에게 대근 요청이
-        전달되도록 변경할 예정입니다.
-
+        현재는 테스트 단계이므로 이 기기에만 저장됩니다.
+        Firebase 연결 후에는 조건에 맞는 팀원들에게
+        대근 요청이 전달되도록 변경할 예정입니다.
       </div>
 
     </div>
@@ -684,28 +794,21 @@
   </div>
 
 
+
   <!-- =====================================================
        근무 달력
   ====================================================== -->
 
-  <div
-    id="workCalendarScreen"
-    class="hidden"
-  >
+  <div id="workCalendarScreen" class="hidden">
 
-    <button
-      class="back-button"
-      onclick="goHome()"
-    >
+    <button class="back-button" onclick="goHome()">
       ← 돌아가기
     </button>
 
 
     <div class="header">
       <h1>근무 달력</h1>
-      <p>
-        기본 교대근무와 실제 일정을 확인합니다.
-      </p>
+      <p>기본 교대근무와 실제 일정을 확인합니다.</p>
     </div>
 
 
@@ -763,8 +866,14 @@
           날짜를 선택하세요.
         </strong>
 
-        <span id="workSelectedShift"></span>
+        <span id="workSelectedShift">
+          달력에서 날짜를 눌러주세요.
+        </span>
 
+        <div
+          id="workSelectedShiftInfo"
+          class="selected-shift-info"
+        ></div>
 
         <div
           id="workSelectedEvents"
@@ -775,11 +884,6 @@
 
     </div>
 
-
-    <!--
-      현재는 대근 / 교육 표시를
-      테스트하기 위한 임시 등록창
-    -->
 
     <div class="form-card">
 
@@ -828,12 +932,8 @@
 
 
       <div class="notice">
-
-        이 입력창은 현재
-        대근과 교육이 달력에
-        어떻게 표시되는지 확인하기 위한
-        테스트 기능입니다.
-
+        현재는 대근과 교육이 달력에 어떻게 표시되는지
+        확인하기 위한 테스트 기능입니다.
       </div>
 
     </div>
@@ -847,74 +947,45 @@
 <script>
 
   /* =====================================================
-     현재 선택된 달력
+     달력 상태
   ====================================================== */
 
   let calendarDate = new Date();
-
   let selectedDate = null;
 
-
   let workCalendarDate = new Date();
-
   let workSelectedDateValue = null;
 
 
 
   /* =====================================================
-     정상 교대근무 패턴
-
+     정상 교대 패턴
      주주 → 휴휴 → 야야 → 휴휴
-
-     총 8일 주기
   ====================================================== */
 
   const shiftPattern = [
-
     "주",
     "주",
-
     "휴",
     "휴",
-
     "야",
     "야",
-
     "휴",
     "휴"
-
   ];
 
 
 
   /* =====================================================
-     교대 기준 날짜
+     실제 교대달력 기준일
 
-     사용자 제공 실제 교대달력 기준
-
-     2026년 12월 2일
-
-     1조 = 주
-     2조 = 휴
-     3조 = 야
-     4조 = 휴
+     2026-12-02
   ====================================================== */
 
   const baseDate =
     new Date(2026, 11, 2);
 
 
-
-  /* =====================================================
-     조별 패턴 위치
-
-     2026-12-02 기준
-
-     1조 : 주
-     2조 : 휴
-     3조 : 야
-     4조 : 휴
-  ====================================================== */
 
   const shiftOffsets = {
 
@@ -931,14 +1002,7 @@
 
 
   /* =====================================================
-     특수근무 변경
-
-     정기보수 / 맞교대 등으로
-     기본근무가 바뀌는 경우 사용.
-
-     지금은 비어 있음.
-
-     나중에 Firebase로 관리 가능.
+     향후 정기보수 등의 특수 근무용
   ====================================================== */
 
   const shiftOverrides = {
@@ -948,7 +1012,7 @@
 
 
   /* =====================================================
-     날짜를 YYYY-MM-DD 형식으로 변환
+     날짜 문자열
   ====================================================== */
 
   function dateKey(date) {
@@ -982,12 +1046,48 @@
 
 
   /* =====================================================
-     실제 근무 계산
+     교대조 변경 이력
   ====================================================== */
 
-  function getWorkType(date) {
+  function getShiftChanges() {
 
-    const shift =
+    return JSON.parse(
+
+      localStorage.getItem(
+        "shiftChanges"
+      )
+
+      ||
+
+      "[]"
+
+    );
+
+  }
+
+
+
+  function saveShiftChanges(changes) {
+
+    localStorage.setItem(
+
+      "shiftChanges",
+
+      JSON.stringify(changes)
+
+    );
+
+  }
+
+
+
+  /*
+    특정 날짜에 사용자가 어느 조인지 계산
+  */
+
+  function getShiftForDate(date) {
+
+    const baseShift =
       localStorage.getItem(
         "userShift"
       ) || "1조";
@@ -997,15 +1097,312 @@
       dateKey(date);
 
 
+    const changes =
+      getShiftChanges()
+        .slice()
+        .sort(
+
+          function(a, b) {
+
+            return (
+              a.effectiveDate
+              .localeCompare(
+                b.effectiveDate
+              )
+            );
+
+          }
+
+        );
+
+
+    let result =
+      baseShift;
+
+
+    changes.forEach(
+
+      function(change) {
+
+        if (
+          change.effectiveDate
+          <=
+          key
+        ) {
+
+          result =
+            change.shift;
+
+        }
+
+      }
+
+    );
+
+
+    return result;
+
+  }
+
+
+
+  /*
+    교대조 변경 등록
+  */
+
+  function addShiftChange() {
+
+    const newShift =
+      document.getElementById(
+        "changeShift"
+      ).value;
+
+
+    const effectiveDate =
+      document.getElementById(
+        "changeShiftDate"
+      ).value;
+
+
+    if (
+      !newShift ||
+      !effectiveDate
+    ) {
+
+      alert(
+        "변경 후 교대조와 적용 시작일을 모두 선택해주세요."
+      );
+
+      return;
+
+    }
+
+
+    let changes =
+      getShiftChanges();
+
 
     /*
-      특수 근무가 등록되어 있다면
-      기본 패턴보다 우선 적용
+      같은 날짜가 이미 있으면
+      새 값으로 교체
+    */
+
+    changes =
+      changes.filter(
+
+        function(item) {
+
+          return (
+            item.effectiveDate
+            !==
+            effectiveDate
+          );
+
+        }
+
+      );
+
+
+    changes.push({
+
+      id:
+        Date.now(),
+
+      effectiveDate:
+        effectiveDate,
+
+      shift:
+        newShift
+
+    });
+
+
+    changes.sort(
+
+      function(a, b) {
+
+        return (
+          a.effectiveDate
+          .localeCompare(
+            b.effectiveDate
+          )
+        );
+
+      }
+
+    );
+
+
+    saveShiftChanges(
+      changes
+    );
+
+
+    document.getElementById(
+      "changeShift"
+    ).value = "";
+
+
+    document.getElementById(
+      "changeShiftDate"
+    ).value = "";
+
+
+    renderShiftHistory();
+
+
+    alert(
+      effectiveDate +
+      "부터 " +
+      newShift +
+      " 근무로 변경됩니다."
+    );
+
+  }
+
+
+
+  function deleteShiftChange(id) {
+
+    let changes =
+      getShiftChanges();
+
+
+    changes =
+      changes.filter(
+
+        function(item) {
+
+          return (
+            item.id !== id
+          );
+
+        }
+
+      );
+
+
+    saveShiftChanges(
+      changes
+    );
+
+
+    renderShiftHistory();
+
+  }
+
+
+
+  function renderShiftHistory() {
+
+    const container =
+      document.getElementById(
+        "shiftHistoryList"
+      );
+
+
+    const changes =
+      getShiftChanges()
+        .slice()
+        .sort(
+
+          function(a, b) {
+
+            return (
+              a.effectiveDate
+              .localeCompare(
+                b.effectiveDate
+              )
+            );
+
+          }
+
+        );
+
+
+    if (
+      changes.length === 0
+    ) {
+
+      container.innerHTML = `
+
+        <div class="shift-history-empty">
+          등록된 교대조 변경 이력이 없습니다.
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+
+      changes.map(
+
+        function(change) {
+
+          return `
+
+            <div class="shift-history-row">
+
+              <span>
+                ${change.effectiveDate}
+                부터
+                <strong>${change.shift}</strong>
+              </span>
+
+              <button
+                class="history-delete"
+                onclick="deleteShiftChange(${change.id})"
+              >
+                삭제
+              </button>
+
+            </div>
+
+          `;
+
+        }
+
+      ).join("");
+
+  }
+
+
+
+  /* =====================================================
+     근무 계산
+  ====================================================== */
+
+  function getWorkType(date) {
+
+    /*
+      해당 날짜의 실제 교대조부터 계산
+    */
+
+    const shift =
+      getShiftForDate(
+        date
+      );
+
+
+    const key =
+      dateKey(date);
+
+
+
+    /*
+      특수 근무 변경이 있다면
+      가장 먼저 적용
     */
 
     if (
 
-      shiftOverrides[shift] &&
+      shiftOverrides[shift]
+
+      &&
 
       shiftOverrides[shift][key]
 
@@ -1018,13 +1415,6 @@
     }
 
 
-
-    /*
-      날짜 차이를 UTC 기준으로 계산
-
-      일광절약시간 등으로 인한
-      날짜 계산 오류 방지
-    */
 
     const targetUTC =
       Date.UTC(
@@ -1072,10 +1462,8 @@
       );
 
 
-
     const offset =
       shiftOffsets[shift] || 0;
-
 
 
     let index =
@@ -1090,14 +1478,14 @@
       shiftPattern.length;
 
 
-
-    if (index < 0) {
+    if (
+      index < 0
+    ) {
 
       index +=
         shiftPattern.length;
 
     }
-
 
 
     return (
@@ -1108,19 +1496,23 @@
 
 
 
-  /* =====================================================
-     주 / 야 / 휴 텍스트
-  ====================================================== */
-
   function workText(type) {
 
-    if (type === "주") {
+    if (
+      type === "주"
+    ) {
+
       return "주간";
+
     }
 
 
-    if (type === "야") {
+    if (
+      type === "야"
+    ) {
+
       return "야간";
+
     }
 
 
@@ -1131,7 +1523,7 @@
 
 
   /* =====================================================
-     화면 숨기기
+     화면 이동
   ====================================================== */
 
   function hideAllScreens() {
@@ -1206,6 +1598,8 @@
 
     loadSettings();
 
+    renderShiftHistory();
+
   }
 
 
@@ -1214,28 +1608,35 @@
 
     const name =
       document
-        .getElementById("name")
+        .getElementById(
+          "name"
+        )
         .value
         .trim();
 
 
     const shift =
       document
-        .getElementById("shift")
+        .getElementById(
+          "shift"
+        )
         .value;
 
 
     const area =
       document
-        .getElementById("area")
+        .getElementById(
+          "area"
+        )
         .value;
 
 
     const role =
       document
-        .getElementById("role")
+        .getElementById(
+          "role"
+        )
         .value;
-
 
 
     if (
@@ -1252,7 +1653,6 @@
       return;
 
     }
-
 
 
     localStorage.setItem(
@@ -1279,7 +1679,6 @@
     );
 
 
-
     const message =
       document.getElementById(
         "savedMessage"
@@ -1291,13 +1690,16 @@
 
 
     setTimeout(
-      function () {
+
+      function() {
 
         message.style.display =
           "none";
 
       },
+
       2000
+
     );
 
   }
@@ -1381,12 +1783,6 @@
       );
 
 
-    const shift =
-      localStorage.getItem(
-        "userShift"
-      );
-
-
     const area =
       localStorage.getItem(
         "userArea"
@@ -1399,6 +1795,12 @@
       );
 
 
+    const todayShift =
+      getShiftForDate(
+        new Date()
+      );
+
+
     return `
 
       <strong>
@@ -1407,7 +1809,7 @@
 
       <br>
 
-      ${shift}
+      현재 ${todayShift}
       ·
       ${area}
       ·
@@ -1463,7 +1865,7 @@
 
     return getEvents().filter(
 
-      function (item) {
+      function(item) {
 
         return (
           item.date === key
@@ -1483,19 +1885,19 @@
 
   function openLeave() {
 
-    if (!settingsReady()) {
+    if (
+      !settingsReady()
+    ) {
 
       alert(
         "먼저 개인 설정을 완료해주세요."
       );
-
 
       openSettings();
 
       return;
 
     }
-
 
 
     hideAllScreens();
@@ -1523,6 +1925,13 @@
 
 
 
+  /*
+    월 변경 표시 버그 수정
+
+    월이 바뀌면 기존 선택 날짜와
+    상세정보를 전부 초기화
+  */
+
   function changeMonth(value) {
 
     calendarDate =
@@ -1539,10 +1948,43 @@
       );
 
 
-    selectedDate = null;
+    selectedDate =
+      null;
+
+
+    resetLeaveSelectedInfo();
 
 
     renderLeaveCalendar();
+
+  }
+
+
+
+  function resetLeaveSelectedInfo() {
+
+    document.getElementById(
+      "selectedDateText"
+    ).textContent =
+      "날짜를 선택하세요.";
+
+
+    document.getElementById(
+      "selectedShiftText"
+    ).textContent =
+      "달력에서 날짜를 눌러주세요.";
+
+
+    document.getElementById(
+      "selectedShiftInfo"
+    ).textContent =
+      "";
+
+
+    document.getElementById(
+      "selectedEvents"
+    ).innerHTML =
+      "";
 
   }
 
@@ -1560,7 +2002,7 @@
 
       selectedDate,
 
-      function (date) {
+      function(date) {
 
         selectedDate =
           date;
@@ -1581,10 +2023,13 @@
 
   function updateLeaveSelected() {
 
-    if (!selectedDate) {
-      return;
-    }
+    if (
+      !selectedDate
+    ) {
 
+      return;
+
+    }
 
 
     const work =
@@ -1592,6 +2037,11 @@
         selectedDate
       );
 
+
+    const shift =
+      getShiftForDate(
+        selectedDate
+      );
 
 
     document
@@ -1617,7 +2067,6 @@
         "일";
 
 
-
     document
       .getElementById(
         "selectedShiftText"
@@ -1628,6 +2077,16 @@
         +
         workText(work);
 
+
+    document
+      .getElementById(
+        "selectedShiftInfo"
+      )
+      .textContent =
+
+        "적용 교대조 : "
+        +
+        shift;
 
 
     renderSelectedEvents(
@@ -1644,7 +2103,9 @@
 
   function saveLeave() {
 
-    if (!selectedDate) {
+    if (
+      !selectedDate
+    ) {
 
       alert(
         "휴가 날짜를 선택해주세요."
@@ -1655,17 +2116,15 @@
     }
 
 
-
     const checked =
       document.querySelector(
-
         'input[name="leaveType"]:checked'
-
       );
 
 
-
-    if (!checked) {
+    if (
+      !checked
+    ) {
 
       alert(
         "휴가 종류를 선택해주세요."
@@ -1676,10 +2135,8 @@
     }
 
 
-
     const events =
       getEvents();
-
 
 
     events.push({
@@ -1703,9 +2160,13 @@
           "userName"
         ),
 
+      /*
+        휴가 날짜 당시 실제 교대조를 저장
+      */
+
       shift:
-        localStorage.getItem(
-          "userShift"
+        getShiftForDate(
+          selectedDate
         ),
 
       area:
@@ -1721,9 +2182,9 @@
     });
 
 
-
-    saveEvents(events);
-
+    saveEvents(
+      events
+    );
 
 
     const message =
@@ -1734,11 +2195,16 @@
 
     message.textContent =
 
-      dateKey(selectedDate)
+      dateKey(
+        selectedDate
+      )
+
       +
       " / "
+
       +
       checked.value
+
       +
       " 등록 완료";
 
@@ -1747,10 +2213,9 @@
       "block";
 
 
-
     setTimeout(
 
-      function () {
+      function() {
 
         message.style.display =
           "none";
@@ -1760,7 +2225,6 @@
       2500
 
     );
-
 
 
     updateLeaveSelected();
@@ -1777,12 +2241,13 @@
 
   function openWorkCalendar() {
 
-    if (!settingsReady()) {
+    if (
+      !settingsReady()
+    ) {
 
       alert(
         "먼저 개인 설정을 완료해주세요."
       );
-
 
       openSettings();
 
@@ -1791,9 +2256,7 @@
     }
 
 
-
     hideAllScreens();
-
 
 
     document
@@ -1804,7 +2267,6 @@
       .remove("hidden");
 
 
-
     document
       .getElementById(
         "workUserSummary"
@@ -1813,12 +2275,15 @@
         getUserSummary();
 
 
-
     renderWorkCalendar();
 
   }
 
 
+
+  /*
+    근무달력 월 이동 버그 수정
+  */
 
   function changeWorkMonth(value) {
 
@@ -1840,7 +2305,39 @@
       null;
 
 
+    resetWorkSelectedInfo();
+
+
     renderWorkCalendar();
+
+  }
+
+
+
+  function resetWorkSelectedInfo() {
+
+    document.getElementById(
+      "workSelectedDate"
+    ).textContent =
+      "날짜를 선택하세요.";
+
+
+    document.getElementById(
+      "workSelectedShift"
+    ).textContent =
+      "달력에서 날짜를 눌러주세요.";
+
+
+    document.getElementById(
+      "workSelectedShiftInfo"
+    ).textContent =
+      "";
+
+
+    document.getElementById(
+      "workSelectedEvents"
+    ).innerHTML =
+      "";
 
   }
 
@@ -1858,7 +2355,7 @@
 
       workSelectedDateValue,
 
-      function (date) {
+      function(date) {
 
         workSelectedDateValue =
           date;
@@ -1879,10 +2376,13 @@
 
   function updateWorkSelected() {
 
-    if (!workSelectedDateValue) {
-      return;
-    }
+    if (
+      !workSelectedDateValue
+    ) {
 
+      return;
+
+    }
 
 
     const work =
@@ -1890,6 +2390,11 @@
         workSelectedDateValue
       );
 
+
+    const shift =
+      getShiftForDate(
+        workSelectedDateValue
+      );
 
 
     document
@@ -1923,7 +2428,6 @@
         "일";
 
 
-
     document
       .getElementById(
         "workSelectedShift"
@@ -1934,6 +2438,16 @@
         +
         workText(work);
 
+
+    document
+      .getElementById(
+        "workSelectedShiftInfo"
+      )
+      .textContent =
+
+        "적용 교대조 : "
+        +
+        shift;
 
 
     renderSelectedEvents(
@@ -1949,12 +2463,14 @@
 
 
   /* =====================================================
-     테스트용 대근 / 교육 등록
+     테스트 대근 / 교육
   ====================================================== */
 
   function saveExtraEvent() {
 
-    if (!workSelectedDateValue) {
+    if (
+      !workSelectedDateValue
+    ) {
 
       alert(
         "날짜를 먼저 선택해주세요."
@@ -1965,27 +2481,20 @@
     }
 
 
-
     const type =
-      document
-        .getElementById(
-          "extraEventType"
-        )
-        .value;
-
+      document.getElementById(
+        "extraEventType"
+      ).value;
 
 
     const hours =
       Number(
 
-        document
-          .getElementById(
-            "extraEventHours"
-          )
-          .value
+        document.getElementById(
+          "extraEventHours"
+        ).value
 
       );
-
 
 
     if (
@@ -1994,7 +2503,7 @@
     ) {
 
       alert(
-        "근무 시간을 입력해주세요."
+        "시간을 올바르게 입력해주세요."
       );
 
       return;
@@ -2002,10 +2511,8 @@
     }
 
 
-
     const events =
       getEvents();
-
 
 
     events.push({
@@ -2033,6 +2540,11 @@
       hours:
         hours,
 
+      shift:
+        getShiftForDate(
+          workSelectedDateValue
+        ),
+
       name:
         localStorage.getItem(
           "userName"
@@ -2041,9 +2553,9 @@
     });
 
 
-
-    saveEvents(events);
-
+    saveEvents(
+      events
+    );
 
 
     renderWorkCalendar();
@@ -2051,13 +2563,9 @@
     updateWorkSelected();
 
 
-
     alert(
-
-      type
-      +
+      type +
       " 일정이 등록되었습니다."
-
     );
 
   }
@@ -2065,7 +2573,7 @@
 
 
   /* =====================================================
-     공통 달력 생성
+     공통 달력
   ====================================================== */
 
   function renderCalendar(
@@ -2090,7 +2598,6 @@
       currentDate.getMonth();
 
 
-
     document
       .getElementById(
         titleId
@@ -2108,31 +2615,20 @@
         "월";
 
 
-
     const firstDay =
       new Date(
-
         year,
-
         month,
-
         1
-
       ).getDay();
-
 
 
     const lastDate =
       new Date(
-
         year,
-
         month + 1,
-
         0
-
       ).getDate();
-
 
 
     const grid =
@@ -2141,8 +2637,8 @@
       );
 
 
-    grid.innerHTML = "";
-
+    grid.innerHTML =
+      "";
 
 
     for (
@@ -2168,7 +2664,6 @@
     }
 
 
-
     for (
       let day = 1;
       day <= lastDate;
@@ -2177,20 +2672,16 @@
 
       const date =
         new Date(
-
           year,
-
           month,
-
           day
-
         );
 
 
-
       const work =
-        getWorkType(date);
-
+        getWorkType(
+          date
+        );
 
 
       const cell =
@@ -2201,7 +2692,6 @@
 
       cell.className =
         "calendar-day";
-
 
 
       if (
@@ -2229,12 +2719,13 @@
       }
 
 
-
       let shiftClass =
         "shift-off";
 
 
-      if (work === "주") {
+      if (
+        work === "주"
+      ) {
 
         shiftClass =
           "shift-day";
@@ -2249,7 +2740,6 @@
           "shift-night";
 
       }
-
 
 
       let html = `
@@ -2270,17 +2760,15 @@
       `;
 
 
-
       const events =
         getEventsForDate(
           date
         );
 
 
-
       events.forEach(
 
-        function (event) {
+        function(event) {
 
           let eventClass =
             "event-leave";
@@ -2308,7 +2796,6 @@
           }
 
 
-
           html += `
 
             <span
@@ -2327,21 +2814,18 @@
       );
 
 
-
       cell.innerHTML =
         html;
 
 
-
       cell.onclick =
-        function () {
+        function() {
 
           clickHandler(
             date
           );
 
         };
-
 
 
       grid.appendChild(
@@ -2355,7 +2839,7 @@
 
 
   /* =====================================================
-     선택된 날짜 일정 표시
+     일정 표시
   ====================================================== */
 
   function renderSelectedEvents(
@@ -2378,25 +2862,28 @@
       );
 
 
-
     if (
       events.length === 0
     ) {
 
-      area.innerHTML =
-        "<div style='color:#888;'>등록된 일정 없음</div>";
+      area.innerHTML = `
+
+        <div style="color:#888;">
+          등록된 일정 없음
+        </div>
+
+      `;
 
       return;
 
     }
 
 
-
     area.innerHTML =
 
       events.map(
 
-        function (event) {
+        function(event) {
 
           return `
 
@@ -2439,11 +2926,10 @@
       getEvents();
 
 
-
     events =
       events.filter(
 
-        function (item) {
+        function(item) {
 
           return (
             item.id !== id
@@ -2454,19 +2940,20 @@
       );
 
 
+    saveEvents(
+      events
+    );
 
-    saveEvents(events);
 
-
-
-    if (selectedDate) {
+    if (
+      selectedDate
+    ) {
 
       updateLeaveSelected();
 
       renderLeaveCalendar();
 
     }
-
 
 
     if (
@@ -2482,7 +2969,6 @@
   }
 
 </script>
-
 
 </body>
 </html>
