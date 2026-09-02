@@ -4,6 +4,8 @@
 
 let calendarDate = new Date();
 let selectedDate = null;
+let leaveRangeStartDate = null;
+let leaveRangeEndDate = null;
 
 let workCalendarDate = new Date();
 let workSelectedDateValue = null;
@@ -1046,6 +1048,19 @@ function switchTestUser(
   );
 
 
+  selectedDate =
+    null;
+
+  leaveRangeStartDate =
+    null;
+
+  leaveRangeEndDate =
+    null;
+
+  workSelectedDateValue =
+    null;
+
+
   loadSettings();
 
   renderShiftHistory();
@@ -1244,7 +1259,7 @@ function getEventsForDate(date) {
 /* =========================================================
    휴가 등록 화면용 일정
 
-   현재 사용자가 등록한 휴가만 반환
+   내가 등록한 휴가와 내가 신청한 대근만 반환
 ========================================================= */
 
 function getMyLeaveEventsForDate(date) {
@@ -1257,14 +1272,80 @@ function getMyLeaveEventsForDate(date) {
 
   return getEventsForDate(
     date
+  ).map(
+
+    function(event) {
+
+      if (
+        event.type !== "휴가"
+      ) {
+
+        return null;
+
+      }
+
+
+      if (
+        event.name === currentName
+      ) {
+
+        return event;
+
+      }
+
+
+      const request =
+        normalizeLeaveEvent(
+          event
+        );
+
+
+      const myClaim =
+        request.claims.find(
+
+          function(claim) {
+
+            return (
+              claim.name === currentName
+            );
+
+          }
+
+        );
+
+
+      if (
+        !myClaim
+      ) {
+
+        return null;
+
+      }
+
+
+      return Object.assign(
+        {},
+        request,
+        {
+          type: "대근",
+          title:
+            "대근 "
+            +
+            myClaim.hours
+            +
+            "h",
+          isClaimedDaegun: true
+        }
+      );
+
+    }
+
   ).filter(
 
     function(event) {
 
-      return (
-        event.type === "휴가"
-        &&
-        event.name === currentName
+      return Boolean(
+        event
       );
 
     }
@@ -1642,6 +1723,252 @@ function openLeave() {
       getUserSummary();
 
 
+  changeLeaveMode();
+
+}
+
+
+
+/* =========================================================
+   로컬 오늘 날짜 기준 과거 여부
+========================================================= */
+
+function isPastDate(date) {
+
+  return (
+    dateKey(date)
+    <
+    dateKey(new Date())
+  );
+
+}
+
+
+
+/* =========================================================
+   하루 / 연속 휴가 모드
+========================================================= */
+
+function getLeaveMode() {
+
+  const checked =
+    document.querySelector(
+      'input[name="leaveMode"]:checked'
+    );
+
+
+  return checked
+    ?
+    checked.value
+    :
+    "single";
+
+}
+
+
+
+function changeLeaveMode() {
+
+  const isRange =
+    getLeaveMode() === "range";
+
+
+  document
+    .getElementById(
+      "leaveRangeFields"
+    )
+    .classList
+    .toggle(
+      "hidden",
+      !isRange
+    );
+
+
+  updateLeaveRangeText();
+
+
+  if (
+    isRange
+  ) {
+
+    resetLeaveSelectedInfo();
+
+
+    document
+      .getElementById(
+        "selectedDateText"
+      )
+      .textContent =
+        "연속 휴가 범위를 선택하세요.";
+
+
+    document
+      .getElementById(
+        "selectedShiftText"
+      )
+      .textContent =
+        "달력에서 시작일과 종료일을 차례로 눌러주세요.";
+
+  }
+
+  else if (
+    selectedDate
+  ) {
+
+    updateLeaveSelected();
+
+  }
+
+  else {
+
+    resetLeaveSelectedInfo();
+
+  }
+
+  renderLeaveCalendar();
+
+}
+
+
+
+function formatFullDate(date) {
+
+  return (
+    date.getFullYear()
+    +
+    "년 "
+    +
+    (date.getMonth() + 1)
+    +
+    "월 "
+    +
+    date.getDate()
+    +
+    "일"
+  );
+
+}
+
+
+
+function updateLeaveRangeText() {
+
+  const text =
+    document
+      .getElementById(
+        "leaveRangeText"
+      );
+
+
+  if (
+    !text
+  ) {
+
+    return;
+
+  }
+
+
+  if (
+    !leaveRangeStartDate
+  ) {
+
+    text.textContent =
+      "달력에서 시작일을 선택하세요.";
+
+    return;
+
+  }
+
+
+  if (
+    !leaveRangeEndDate
+  ) {
+
+    text.textContent =
+      "시작일: "
+      +
+      formatFullDate(
+        leaveRangeStartDate
+      )
+      +
+      " · 종료일을 선택하세요.";
+
+    return;
+
+  }
+
+
+  text.textContent =
+    formatFullDate(
+      leaveRangeStartDate
+    )
+    +
+    " ~ "
+    +
+    formatFullDate(
+      leaveRangeEndDate
+    );
+
+}
+
+
+
+function selectLeaveRangeDate(date) {
+
+  if (
+    isPastDate(date)
+  ) {
+
+    alert(
+      "지난 날짜에는 휴가를 등록할 수 없습니다."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !leaveRangeStartDate
+    ||
+    leaveRangeEndDate
+  ) {
+
+    leaveRangeStartDate =
+      date;
+
+    leaveRangeEndDate =
+      null;
+
+  }
+
+  else {
+
+    if (
+      date < leaveRangeStartDate
+    ) {
+
+      leaveRangeEndDate =
+        leaveRangeStartDate;
+
+      leaveRangeStartDate =
+        date;
+
+    }
+
+    else {
+
+      leaveRangeEndDate =
+        date;
+
+    }
+
+  }
+
+
+  updateLeaveRangeText();
+
   renderLeaveCalendar();
 
 }
@@ -1668,11 +1995,17 @@ function changeMonth(value) {
     );
 
 
-  selectedDate =
-    null;
+  if (
+    getLeaveMode() === "single"
+  ) {
+
+    selectedDate =
+      null;
 
 
-  resetLeaveSelectedInfo();
+    resetLeaveSelectedInfo();
+
+  }
 
   renderLeaveCalendar();
 
@@ -1717,6 +2050,26 @@ function resetLeaveSelectedInfo() {
     .innerHTML =
       "";
 
+
+  document
+    .getElementById(
+      "leaveOffWarning"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "leavePastWarning"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
 }
 
 
@@ -1735,22 +2088,52 @@ function renderLeaveCalendar() {
 
     "calendarGrid",
 
-    selectedDate,
+    getLeaveMode() === "single"
+    ?
+    selectedDate
+    :
+    null,
 
     getMyLeaveEventsForDate,
 
     getWorkType,
 
+    getLeaveMode() === "range"
+    ?
+    leaveRangeStartDate
+    :
+    null,
+
+    getLeaveMode() === "range"
+    ?
+    leaveRangeEndDate
+    :
+    null,
+
     function(date) {
 
-      selectedDate =
-        date;
+      if (
+        getLeaveMode() === "range"
+      ) {
+
+        selectLeaveRangeDate(
+          date
+        );
+
+      }
+
+      else {
+
+        selectedDate =
+          date;
 
 
-      updateLeaveSelected();
+        updateLeaveSelected();
 
 
-      renderLeaveCalendar();
+        renderLeaveCalendar();
+
+      }
 
     }
 
@@ -1843,6 +2226,28 @@ function updateLeaveSelected() {
       shift;
 
 
+  document
+    .getElementById(
+      "leaveOffWarning"
+    )
+    .classList
+    .toggle(
+      "hidden",
+      work !== "휴"
+    );
+
+
+  document
+    .getElementById(
+      "leavePastWarning"
+    )
+    .classList
+    .toggle(
+      "hidden",
+      !isPastDate(selectedDate)
+    );
+
+
   renderSelectedEvents(
 
     selectedDate,
@@ -1861,7 +2266,471 @@ function updateLeaveSelected() {
    휴가 저장
 ========================================================= */
 
+function isDuplicateLeave(
+  events,
+  date,
+  leaveType,
+  userName
+) {
+
+  const key =
+    dateKey(
+      date
+    );
+
+
+  return events.some(
+
+    function(event) {
+
+      return (
+        event.type === "휴가"
+        &&
+        event.name === userName
+        &&
+        event.date === key
+        &&
+        event.title === leaveType
+      );
+
+    }
+
+  );
+
+}
+
+
+
+function createLeaveEvent(
+  date,
+  leaveType,
+  rule,
+  id
+) {
+
+  return {
+    id: id,
+    date: dateKey(date),
+    type: "휴가",
+    title: leaveType,
+    requiredHours: rule.requiredHours,
+    availableClaimHours: rule.availableClaimHours,
+    claims: [],
+    claimedHours: 0,
+    remainingHours: rule.requiredHours,
+    status: "모집중",
+    name: localStorage.getItem("userName"),
+    shift: getShiftForDate(date),
+    area: localStorage.getItem("userArea"),
+    role: localStorage.getItem("userRole")
+  };
+
+}
+
+
+
+function showLeaveMessage(text) {
+
+  const message =
+    document
+      .getElementById(
+        "leaveSavedMessage"
+      );
+
+
+  if (
+    !message
+  ) {
+
+    return;
+
+  }
+
+
+  message.textContent =
+    text;
+
+
+  message.style.display =
+    "block";
+
+
+  setTimeout(
+
+    function() {
+
+      message.style.display =
+        "none";
+
+    },
+
+    3500
+
+  );
+
+}
+
+
+
+function formatMonthDay(date) {
+
+  return (
+    (date.getMonth() + 1)
+    +
+    "월 "
+    +
+    date.getDate()
+    +
+    "일"
+  );
+
+}
+
+
+
 function saveLeave() {
+
+  const checked =
+    document.querySelector(
+      'input[name="leaveType"]:checked'
+    );
+
+
+  if (
+    !checked
+  ) {
+
+    alert(
+      "휴가 종류를 선택해주세요."
+    );
+
+    return;
+
+  }
+
+
+  const leaveType =
+    checked.value;
+
+
+  const rule =
+    leaveRules[leaveType];
+
+
+  if (
+    !rule
+  ) {
+
+    alert(
+      "휴가 종류 설정을 확인해주세요."
+    );
+
+    return;
+
+  }
+
+
+  const events =
+    getEvents();
+
+
+  const userName =
+    localStorage.getItem(
+      "userName"
+    );
+
+
+  if (
+    getLeaveMode() === "single"
+  ) {
+
+    if (
+      !selectedDate
+    ) {
+
+      alert(
+        "휴가 날짜를 선택해주세요."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      isPastDate(selectedDate)
+    ) {
+
+      alert(
+        "지난 날짜에는 휴가를 등록할 수 없습니다."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      getWorkType(selectedDate) === "휴"
+    ) {
+
+      alert(
+        "해당 날짜는 휴무입니다. 근무 일정을 확인해주세요."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      isDuplicateLeave(
+        events,
+        selectedDate,
+        leaveType,
+        userName
+      )
+    ) {
+
+      alert(
+        "같은 날짜에 같은 종류의 휴가가 이미 등록되어 있습니다."
+      );
+
+      return;
+
+    }
+
+
+    saveSingleLeave();
+
+    return;
+
+  }
+
+
+  if (
+    !leaveRangeStartDate
+    ||
+    !leaveRangeEndDate
+  ) {
+
+    alert(
+      "달력에서 시작일과 종료일을 모두 선택해주세요."
+    );
+
+    return;
+
+  }
+
+
+  const startDate =
+    new Date(
+      leaveRangeStartDate.getFullYear(),
+      leaveRangeStartDate.getMonth(),
+      leaveRangeStartDate.getDate()
+    );
+
+
+  const endDate =
+    new Date(
+      leaveRangeEndDate.getFullYear(),
+      leaveRangeEndDate.getMonth(),
+      leaveRangeEndDate.getDate()
+    );
+
+
+  if (
+    startDate > endDate
+  ) {
+
+    alert(
+      "시작일은 종료일보다 늦을 수 없습니다."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    isPastDate(startDate)
+    ||
+    isPastDate(endDate)
+  ) {
+
+    alert(
+      "지난 날짜에는 휴가를 등록할 수 없습니다."
+    );
+
+    return;
+
+  }
+
+
+  let workDayCount = 0;
+  let offDayCount = 0;
+  let duplicateCount = 0;
+  let registeredCount = 0;
+  let sequence = 0;
+
+
+  const cursor =
+    new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate()
+    );
+
+
+  const baseId =
+    Date.now();
+
+
+  while (
+    cursor <= endDate
+  ) {
+
+    const targetDate =
+      new Date(
+        cursor.getFullYear(),
+        cursor.getMonth(),
+        cursor.getDate()
+      );
+
+
+    if (
+      getWorkType(targetDate) === "휴"
+    ) {
+
+      offDayCount += 1;
+
+    }
+
+    else {
+
+      workDayCount += 1;
+
+
+      if (
+        isDuplicateLeave(
+          events,
+          targetDate,
+          leaveType,
+          userName
+        )
+      ) {
+
+        duplicateCount += 1;
+
+      }
+
+      else {
+
+        events.push(
+          createLeaveEvent(
+            targetDate,
+            leaveType,
+            rule,
+            baseId + sequence
+          )
+        );
+
+
+        registeredCount += 1;
+
+      }
+
+    }
+
+
+    sequence += 1;
+
+    cursor.setDate(
+      cursor.getDate() + 1
+    );
+
+  }
+
+
+  if (
+    registeredCount > 0
+  ) {
+
+    saveEvents(
+      events
+    );
+
+
+    checked.checked =
+      false;
+
+  }
+
+
+  let resultText =
+    formatMonthDay(startDate)
+    +
+    " ~ "
+    +
+    formatMonthDay(endDate)
+    +
+    " 중 근무일 "
+    +
+    registeredCount
+    +
+    "일의 "
+    +
+    leaveType
+    +
+    "가 등록되었습니다. 휴무일 "
+    +
+    offDayCount
+    +
+    "일은 제외되었습니다.";
+
+
+  if (
+    duplicateCount > 0
+  ) {
+
+    resultText +=
+      " 중복 "
+      +
+      duplicateCount
+      +
+      "일은 추가하지 않았습니다.";
+
+  }
+
+
+  if (
+    registeredCount === 0
+    &&
+    workDayCount > 0
+  ) {
+
+    resultText =
+      "선택한 기간의 근무일은 모두 같은 휴가가 이미 등록되어 있습니다. 휴무일 "
+      +
+      offDayCount
+      +
+      "일은 제외되었습니다.";
+
+  }
+
+
+  showLeaveMessage(
+    resultText
+  );
+
+
+  renderLeaveCalendar();
+
+}
+
+
+
+function saveSingleLeave() {
 
   if (
     !selectedDate
@@ -2151,6 +3020,57 @@ function openDaegunRequests() {
    대근 요청 목록
 ========================================================= */
 
+function renderMyClaimControls(
+  request,
+  myClaim
+) {
+
+  return `
+
+    <div class="request-complete">
+      현재 신청시간: ${myClaim.hours}시간
+    </div>
+
+    <div class="claim-change-label">
+      대근시간 변경
+    </div>
+
+    <div class="claim-buttons claim-change-buttons">
+
+      ${request.availableClaimHours.map(
+
+        function(hours) {
+
+          return `
+
+            <button
+              class="claim-button ${hours === Number(myClaim.hours) ? "selected" : ""}"
+              onclick="updateDaegunClaimHours(${request.id}, ${hours})"
+            >
+              ${hours}시간
+            </button>
+
+          `;
+
+        }
+
+      ).join("")}
+
+    </div>
+
+    <button
+      class="cancel-claim-button"
+      onclick="cancelDaegunClaim(${request.id})"
+    >
+      내 대근 취소
+    </button>
+
+  `;
+
+}
+
+
+
 function renderDaegunRequests() {
 
   const container =
@@ -2219,22 +3139,29 @@ function renderDaegunRequests() {
       );
 
 
-  if (
-    requests.length === 0
-  ) {
+  /*
+    오늘보다 이전 날짜의 요청은 목록에서만 숨긴다.
+    원본 이벤트와 대근 신청 기록은 삭제하지 않는다.
+  */
 
-    container.innerHTML = `
-
-      <div class="no-request">
-        현재 등록된 대근 요청이 없습니다.
-      </div>
-
-    `;
+  const todayKey =
+    dateKey(
+      new Date()
+    );
 
 
-    return;
+  requests =
+    requests.filter(
 
-  }
+      function(request) {
+
+        return (
+          request.date >= todayKey
+        );
+
+      }
+
+    );
 
 
   const currentName =
@@ -2243,9 +3170,51 @@ function renderDaegunRequests() {
     );
 
 
-  container.innerHTML =
+  const recruitingRequests =
+    requests.filter(
 
-    requests.map(
+      function(request) {
+
+        return (
+          request.status === "모집중"
+        );
+
+      }
+
+    );
+
+
+  const completedRequests =
+    requests.filter(
+
+      function(request) {
+
+        return (
+          request.status === "완료"
+        );
+
+      }
+
+    );
+
+
+  const recruitingHTML =
+
+    recruitingRequests.length === 0
+
+    ?
+
+    `
+
+      <div class="no-request">
+        현재 모집 중인 대근 요청이 없습니다.
+      </div>
+
+    `
+
+    :
+
+    recruitingRequests.map(
 
       function(request) {
 
@@ -2400,25 +3369,11 @@ function renderDaegunRequests() {
           myClaim
         ) {
 
-          actionHTML = `
-
-            <div class="request-complete">
-
-              내가 ${myClaim.hours}시간 대근 예정
-
-            </div>
-
-
-            <button
-              class="cancel-claim-button"
-              onclick="cancelDaegunClaim(${request.id})"
-            >
-
-              내 대근 취소
-
-            </button>
-
-          `;
+          actionHTML =
+            renderMyClaimControls(
+              request,
+              myClaim
+            );
 
         }
 
@@ -2557,6 +3512,144 @@ function renderDaegunRequests() {
       }
 
     ).join("");
+
+
+  const completedHTML = `
+
+    <details class="completed-requests">
+
+      <summary>
+        대근 모집 완료 (${completedRequests.length})
+      </summary>
+
+      <div class="completed-request-list">
+
+        ${
+          completedRequests.length === 0
+
+          ?
+
+          `
+            <div class="completed-request-empty">
+              완료된 대근 요청이 없습니다.
+            </div>
+          `
+
+          :
+
+          completedRequests.map(
+
+            function(request) {
+
+              const myClaim =
+                request.claims.find(
+
+                  function(claim) {
+
+                    return (
+                      claim.name === currentName
+                    );
+
+                  }
+
+                );
+
+              const claimsHTML =
+
+                request.claims.length === 0
+
+                ?
+
+                `
+                  <div class="completed-request-empty">
+                    등록된 대근자가 없습니다.
+                  </div>
+                `
+
+                :
+
+                request.claims.map(
+
+                  function(claim) {
+
+                    return `
+
+                      <div class="claim-row">
+
+                        <span>
+                          ${claim.name}
+                        </span>
+
+                        <span>
+                          ${claim.hours}시간
+                        </span>
+
+                      </div>
+
+                    `;
+
+                  }
+
+                ).join("");
+
+
+              return `
+
+                <div class="request-card complete completed-request-card">
+
+                  <div class="request-date">
+                    ${formatRequestDate(request.date)}
+                  </div>
+
+                  <div class="request-person">
+                    ${request.name}
+                  </div>
+
+                  <div class="request-info">
+                    휴가 : ${request.title}
+                  </div>
+
+                  <div class="claim-list">
+
+                    <strong>
+                      대근자
+                    </strong>
+
+                    ${claimsHTML}
+
+                  </div>
+
+                  ${
+                    myClaim
+                    ?
+                    renderMyClaimControls(
+                      request,
+                      myClaim
+                    )
+                    :
+                    ""
+                  }
+
+                </div>
+
+              `;
+
+            }
+
+          ).join("")
+        }
+
+      </div>
+
+    </details>
+
+  `;
+
+
+  container.innerHTML =
+    recruitingHTML
+    +
+    completedHTML;
 
 
   /*
@@ -2857,6 +3950,196 @@ function claimDaegun(
    내가 잡은 대근 취소
 ========================================================= */
 
+function updateDaegunClaimHours(
+  requestId,
+  hours
+) {
+
+  const currentName =
+    localStorage.getItem(
+      "userName"
+    );
+
+
+  let events =
+    getEvents();
+
+
+  const index =
+    events.findIndex(
+
+      function(event) {
+
+        return (
+          event.id === requestId
+        );
+
+      }
+
+    );
+
+
+  if (
+    index === -1
+  ) {
+
+    return;
+
+  }
+
+
+  let request =
+    normalizeLeaveEvent(
+      events[index]
+    );
+
+
+  const claim =
+    request.claims.find(
+
+      function(item) {
+
+        return (
+          item.name === currentName
+        );
+
+      }
+
+    );
+
+
+  if (
+    !claim
+  ) {
+
+    alert(
+      "변경할 대근 신청을 찾을 수 없습니다."
+    );
+
+    return;
+
+  }
+
+
+  const newHours =
+    Number(
+      hours
+    );
+
+
+  if (
+    !request.availableClaimHours.includes(
+      newHours
+    )
+  ) {
+
+    alert(
+      "선택할 수 없는 대근시간입니다."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    Number(claim.hours) === newHours
+  ) {
+
+    return;
+
+  }
+
+
+  const otherClaimedHours =
+    request.claims.reduce(
+
+      function(sum, item) {
+
+        if (
+          item === claim
+        ) {
+
+          return sum;
+
+        }
+
+
+        return (
+          sum
+          +
+          Number(item.hours)
+        );
+
+      },
+
+      0
+
+    );
+
+
+  if (
+    otherClaimedHours + newHours
+    >
+    request.requiredHours
+  ) {
+
+    alert(
+      "다른 대근자의 신청시간을 포함하면 필요한 대근시간을 초과합니다."
+    );
+
+    return;
+
+  }
+
+
+  claim.hours =
+    newHours;
+
+
+  request =
+    normalizeLeaveEvent(
+      request
+    );
+
+
+  events[index] =
+    request;
+
+
+  saveEvents(
+    events
+  );
+
+
+  renderDaegunRequests();
+
+
+  if (
+    selectedDate
+  ) {
+
+    updateLeaveSelected();
+
+    renderLeaveCalendar();
+
+  }
+
+
+  if (
+    workSelectedDateValue
+  ) {
+
+    updateWorkSelected();
+
+    renderWorkCalendar();
+
+  }
+
+}
+
+
+
 function cancelDaegunClaim(
   requestId
 ) {
@@ -3106,6 +4389,10 @@ function renderWorkCalendar() {
       ).work;
 
     },
+
+    null,
+
+    null,
 
     function(date) {
 
@@ -3380,6 +4667,10 @@ function renderCalendar(
 
   workGetter,
 
+  rangeStart,
+
+  rangeEnd,
+
   clickHandler
 
 ) {
@@ -3532,6 +4823,93 @@ function renderCalendar(
         .add(
           "selected"
         );
+
+    }
+
+
+    const key =
+      dateKey(
+        date
+      );
+
+
+    if (
+      isPastDate(date)
+    ) {
+
+      cell.classList.add(
+        "past"
+      );
+
+    }
+
+
+    if (
+      key === dateKey(new Date())
+    ) {
+
+      cell.classList.add(
+        "today"
+      );
+
+    }
+
+
+    if (
+      rangeStart
+    ) {
+
+      const startKey =
+        dateKey(
+          rangeStart
+        );
+
+
+      const endKey =
+        rangeEnd
+        ?
+        dateKey(rangeEnd)
+        :
+        null;
+
+
+      if (
+        key === startKey
+      ) {
+
+        cell.classList.add(
+          "range-start"
+        );
+
+      }
+
+
+      if (
+        endKey
+        &&
+        key === endKey
+      ) {
+
+        cell.classList.add(
+          "range-end"
+        );
+
+      }
+
+
+      if (
+        endKey
+        &&
+        key >= startKey
+        &&
+        key <= endKey
+      ) {
+
+        cell.classList.add(
+          "range-selected"
+        );
+
+      }
 
     }
 
@@ -3708,21 +5086,44 @@ function renderSelectedEvents(
           event.isClaimedDaegun
         ) {
 
+          const currentName =
+            localStorage.getItem(
+              "userName"
+            );
+
+
+          const myClaim =
+            event.claims.find(
+
+              function(claim) {
+
+                return (
+                  claim.name === currentName
+                );
+
+              }
+
+            );
+
           return `
 
-            <div class="event-row">
+            <div class="event-row claimed-daegun-controls">
 
-              <span>
+              <strong class="claimed-daegun-title">
                 ${event.title}
-              </span>
+              </strong>
 
 
-              <button
-                class="delete-button"
-                onclick="cancelDaegunClaim(${event.id})"
-              >
-                대근 취소
-              </button>
+              ${
+                myClaim
+                ?
+                renderMyClaimControls(
+                  event,
+                  myClaim
+                )
+                :
+                ""
+              }
 
             </div>
 
@@ -4047,6 +5448,17 @@ function refreshDateSensitiveUI() {
   ) {
 
     renderLeaveCalendar();
+
+
+    if (
+      getLeaveMode() === "single"
+      &&
+      selectedDate
+    ) {
+
+      updateLeaveSelected();
+
+    }
 
   }
 

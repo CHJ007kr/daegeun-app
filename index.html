@@ -470,7 +470,10 @@
 
 
 
-    <div class="calendar-card">
+    <div
+      id="leaveCalendarCard"
+      class="calendar-card"
+    >
 
 
       <div class="calendar-header">
@@ -535,6 +538,22 @@
 
 
         <div
+          id="leaveOffWarning"
+          class="leave-off-warning hidden"
+        >
+          해당 날짜는 휴무입니다. 근무 일정을 확인해주세요.
+        </div>
+
+
+        <div
+          id="leavePastWarning"
+          class="leave-past-warning hidden"
+        >
+          지난 날짜에는 휴가를 등록할 수 없습니다.
+        </div>
+
+
+        <div
           id="selectedEvents"
           class="selected-event-list"
         ></div>
@@ -548,6 +567,53 @@
     <!-- 휴가 종류 -->
 
     <div class="form-card">
+
+      <h2 class="section-title">
+        등록 방식
+      </h2>
+
+
+      <div class="leave-mode-options">
+
+        <label class="leave-mode-option">
+          <input
+            type="radio"
+            name="leaveMode"
+            value="single"
+            checked
+            onchange="changeLeaveMode()"
+          >
+          <span>하루</span>
+        </label>
+
+        <label class="leave-mode-option">
+          <input
+            type="radio"
+            name="leaveMode"
+            value="range"
+            onchange="changeLeaveMode()"
+          >
+          <span>연속</span>
+        </label>
+
+      </div>
+
+
+      <div
+        id="leaveRangeFields"
+        class="leave-range-summary hidden"
+      >
+
+        <strong>선택된 연속 휴가 기간</strong>
+
+        <span id="leaveRangeText">
+          달력에서 시작일을 선택하세요.
+        </span>
+
+      </div>
+
+
+      <div class="leave-section-divider"></div>
 
       <h2 class="section-title">
         휴가 종류
