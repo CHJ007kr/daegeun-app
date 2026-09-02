@@ -72,6 +72,71 @@
       font-size: 28px;
       margin-bottom: 10px;
     }
+
+    .hidden {
+      display: none;
+    }
+
+    .back-button {
+      border: none;
+      background: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 20px;
+    }
+
+    .form-card {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+      background: white;
+    }
+
+    .save-button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: #222;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .save-button:active {
+      transform: scale(0.99);
+    }
+
+    .saved-message {
+      margin-top: 14px;
+      text-align: center;
+      color: #2e7d32;
+      font-size: 14px;
+      display: none;
+    }
   </style>
 </head>
 
@@ -79,34 +144,152 @@
 
   <div class="app">
 
-    <div class="header">
-      <h1>대근 관리</h1>
-      <p>정유1팀 대근 관리 시스템</p>
+    <!-- 메인 화면 -->
+    <div id="homeScreen">
+
+      <div class="header">
+        <h1>대근 관리</h1>
+        <p>정유1팀 대근 관리 시스템</p>
+      </div>
+
+      <div class="menu">
+
+        <div class="menu-card" onclick="alert('대근 등록 화면은 다음 단계에서 만들 예정입니다.')">
+          <div class="icon">🕐</div>
+          <h2>대근 등록</h2>
+          <p>휴가 및 대근 신청을 등록합니다.</p>
+        </div>
+
+        <div class="menu-card" onclick="alert('근무 달력 화면은 다음 단계에서 만들 예정입니다.')">
+          <div class="icon">📅</div>
+          <h2>근무 달력</h2>
+          <p>주간 · 야간 · 휴무 · 대근 · 교육 일정을 확인합니다.</p>
+        </div>
+
+        <div class="menu-card" onclick="openSettings()">
+          <div class="icon">⚙️</div>
+          <h2>개인 설정</h2>
+          <p>이름 · 교대조 · 근무지역 · 근무 역할을 설정합니다.</p>
+        </div>
+
+      </div>
     </div>
 
-    <div class="menu">
 
-      <div class="menu-card" onclick="alert('대근 등록 화면은 다음 단계에서 만들 예정입니다.')">
-        <div class="icon">🕐</div>
-        <h2>대근 등록</h2>
-        <p>휴가 및 대근 신청을 등록합니다.</p>
+    <!-- 개인 설정 화면 -->
+    <div id="settingsScreen" class="hidden">
+
+      <button class="back-button" onclick="goHome()">← 돌아가기</button>
+
+      <div class="header">
+        <h1>개인 설정</h1>
+        <p>내 근무 정보를 설정합니다.</p>
       </div>
 
-      <div class="menu-card" onclick="alert('근무 달력 화면은 다음 단계에서 만들 예정입니다.')">
-        <div class="icon">📅</div>
-        <h2>근무 달력</h2>
-        <p>주간 · 야간 · 휴무 · 대근 · 교육 일정을 확인합니다.</p>
-      </div>
+      <div class="form-card">
 
-      <div class="menu-card" onclick="alert('개인 설정 화면은 다음 단계에서 만들 예정입니다.')">
-        <div class="icon">⚙️</div>
-        <h2>개인 설정</h2>
-        <p>이름 · 교대조 · 근무지역 · 직책을 설정합니다.</p>
-      </div>
+        <div class="form-group">
+          <label for="name">이름</label>
+          <input type="text" id="name" placeholder="이름을 입력하세요">
+        </div>
 
+        <div class="form-group">
+          <label for="shift">교대조</label>
+          <select id="shift">
+            <option value="">선택하세요</option>
+            <option value="1조">1조</option>
+            <option value="2조">2조</option>
+            <option value="3조">3조</option>
+            <option value="4조">4조</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="area">근무지역</label>
+          <select id="area">
+            <option value="">선택하세요</option>
+            <option value="NO.1 PROCESS">NO.1 PROCESS</option>
+            <option value="NO.2 PROCESS">NO.2 PROCESS</option>
+            <option value="WWT">WWT</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="role">근무 역할</label>
+          <select id="role">
+            <option value="">선택하세요</option>
+            <option value="기술장">기술장</option>
+            <option value="보드">보드</option>
+            <option value="현장">현장</option>
+          </select>
+        </div>
+
+        <button class="save-button" onclick="saveSettings()">저장하기</button>
+
+        <div id="savedMessage" class="saved-message">
+          저장되었습니다.
+        </div>
+
+      </div>
     </div>
 
   </div>
+
+
+  <script>
+
+    function openSettings() {
+      document.getElementById("homeScreen").classList.add("hidden");
+      document.getElementById("settingsScreen").classList.remove("hidden");
+
+      loadSettings();
+    }
+
+
+    function goHome() {
+      document.getElementById("settingsScreen").classList.add("hidden");
+      document.getElementById("homeScreen").classList.remove("hidden");
+    }
+
+
+    function saveSettings() {
+
+      const name = document.getElementById("name").value;
+      const shift = document.getElementById("shift").value;
+      const area = document.getElementById("area").value;
+      const role = document.getElementById("role").value;
+
+      localStorage.setItem("userName", name);
+      localStorage.setItem("userShift", shift);
+      localStorage.setItem("userArea", area);
+      localStorage.setItem("userRole", role);
+
+      const message = document.getElementById("savedMessage");
+
+      message.style.display = "block";
+
+      setTimeout(() => {
+        message.style.display = "none";
+      }, 2000);
+    }
+
+
+    function loadSettings() {
+
+      document.getElementById("name").value =
+        localStorage.getItem("userName") || "";
+
+      document.getElementById("shift").value =
+        localStorage.getItem("userShift") || "";
+
+      document.getElementById("area").value =
+        localStorage.getItem("userArea") || "";
+
+      document.getElementById("role").value =
+        localStorage.getItem("userRole") || "";
+    }
+
+  </script>
 
 </body>
 </html>
