@@ -20,7 +20,7 @@
     .app {
       max-width: 480px;
       margin: 0 auto;
-      padding: 24px 16px;
+      padding: 24px 16px 50px;
     }
 
     .header {
@@ -86,11 +86,13 @@
       margin-bottom: 20px;
     }
 
-    .form-card {
+    .form-card,
+    .calendar-card {
       background: white;
       padding: 20px;
       border-radius: 16px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
     }
 
     .form-group {
@@ -126,10 +128,6 @@
       cursor: pointer;
     }
 
-    .save-button:active {
-      transform: scale(0.99);
-    }
-
     .saved-message {
       margin-top: 14px;
       text-align: center;
@@ -137,159 +135,956 @@
       font-size: 14px;
       display: none;
     }
+
+    /* 달력 */
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .calendar-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .month-button {
+      border: none;
+      background: #f1f3f5;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .weekdays,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .weekday {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+      padding-bottom: 8px;
+    }
+
+    .calendar-day {
+      min-height: 60px;
+      border: 1px solid #e1e4e8;
+      border-radius: 10px;
+      padding: 6px 3px;
+      text-align: center;
+      cursor: pointer;
+      background: white;
+    }
+
+    .calendar-day.empty {
+      visibility: hidden;
+    }
+
+    .calendar-day.selected {
+      border: 2px solid #222;
+      background: #f1f3f5;
+    }
+
+    .day-number {
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .shift-label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 3px 6px;
+      border-radius: 8px;
+    }
+
+    .shift-day {
+      background: #fff3cd;
+      color: #7a5b00;
+    }
+
+    .shift-night {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .shift-off {
+      background: #e9ecef;
+      color: #666;
+    }
+
+    .selected-info {
+      margin-top: 16px;
+      padding: 14px;
+      background: #f7f8fa;
+      border-radius: 12px;
+    }
+
+    .selected-info strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+
+    /* 휴가 종류 */
+
+    .leave-title {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+
+    .leave-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .leave-option {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .leave-option input {
+      width: 18px;
+      height: 18px;
+    }
+
+    .leave-option span {
+      font-size: 15px;
+    }
+
+    .user-summary {
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      background: #eef2f5;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .notice {
+      font-size: 12px;
+      color: #777;
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+
   </style>
 </head>
 
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <!-- 메인 화면 -->
-    <div id="homeScreen">
+  <!-- ================= 메인 ================= -->
 
-      <div class="header">
-        <h1>대근 관리</h1>
-        <p>정유1팀 대근 관리 시스템</p>
-      </div>
+  <div id="homeScreen">
 
-      <div class="menu">
-
-        <div class="menu-card" onclick="alert('대근 등록 화면은 다음 단계에서 만들 예정입니다.')">
-          <div class="icon">🕐</div>
-          <h2>대근 등록</h2>
-          <p>휴가 및 대근 신청을 등록합니다.</p>
-        </div>
-
-        <div class="menu-card" onclick="alert('근무 달력 화면은 다음 단계에서 만들 예정입니다.')">
-          <div class="icon">📅</div>
-          <h2>근무 달력</h2>
-          <p>주간 · 야간 · 휴무 · 대근 · 교육 일정을 확인합니다.</p>
-        </div>
-
-        <div class="menu-card" onclick="openSettings()">
-          <div class="icon">⚙️</div>
-          <h2>개인 설정</h2>
-          <p>이름 · 교대조 · 근무지역 · 근무 역할을 설정합니다.</p>
-        </div>
-
-      </div>
+    <div class="header">
+      <h1>대근 관리</h1>
+      <p>정유1팀 대근 관리 시스템</p>
     </div>
 
+    <div class="menu">
 
-    <!-- 개인 설정 화면 -->
-    <div id="settingsScreen" class="hidden">
-
-      <button class="back-button" onclick="goHome()">← 돌아가기</button>
-
-      <div class="header">
-        <h1>개인 설정</h1>
-        <p>내 근무 정보를 설정합니다.</p>
+      <div class="menu-card" onclick="openDaegun()">
+        <div class="icon">🕐</div>
+        <h2>대근 등록</h2>
+        <p>휴가 일정을 등록하고 대근 요청을 생성합니다.</p>
       </div>
 
-      <div class="form-card">
-
-        <div class="form-group">
-          <label for="name">이름</label>
-          <input type="text" id="name" placeholder="이름을 입력하세요">
-        </div>
-
-        <div class="form-group">
-          <label for="shift">교대조</label>
-          <select id="shift">
-            <option value="">선택하세요</option>
-            <option value="1조">1조</option>
-            <option value="2조">2조</option>
-            <option value="3조">3조</option>
-            <option value="4조">4조</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="area">근무지역</label>
-          <select id="area">
-            <option value="">선택하세요</option>
-            <option value="NO.1 PROCESS">NO.1 PROCESS</option>
-            <option value="NO.2 PROCESS">NO.2 PROCESS</option>
-            <option value="WWT">WWT</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="role">근무 역할</label>
-          <select id="role">
-            <option value="">선택하세요</option>
-            <option value="기술장">기술장</option>
-            <option value="보드">보드</option>
-            <option value="현장">현장</option>
-          </select>
-        </div>
-
-        <button class="save-button" onclick="saveSettings()">저장하기</button>
-
-        <div id="savedMessage" class="saved-message">
-          저장되었습니다.
-        </div>
-
+      <div class="menu-card"
+           onclick="alert('근무 달력 화면은 다음 단계에서 만들 예정입니다.')">
+        <div class="icon">📅</div>
+        <h2>근무 달력</h2>
+        <p>주간 · 야간 · 휴무 · 대근 · 교육 일정을 확인합니다.</p>
       </div>
+
+      <div class="menu-card" onclick="openSettings()">
+        <div class="icon">⚙️</div>
+        <h2>개인 설정</h2>
+        <p>이름 · 교대조 · 근무지역 · 근무 역할을 설정합니다.</p>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ================= 개인 설정 ================= -->
+
+  <div id="settingsScreen" class="hidden">
+
+    <button class="back-button" onclick="goHome()">← 돌아가기</button>
+
+    <div class="header">
+      <h1>개인 설정</h1>
+      <p>내 근무 정보를 설정합니다.</p>
+    </div>
+
+    <div class="form-card">
+
+      <div class="form-group">
+        <label for="name">이름</label>
+        <input type="text" id="name" placeholder="이름을 입력하세요">
+      </div>
+
+      <div class="form-group">
+        <label for="shift">교대조</label>
+
+        <select id="shift">
+          <option value="">선택하세요</option>
+          <option value="1조">1조</option>
+          <option value="2조">2조</option>
+          <option value="3조">3조</option>
+          <option value="4조">4조</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="area">근무지역</label>
+
+        <select id="area">
+          <option value="">선택하세요</option>
+          <option value="NO.1 PROCESS">NO.1 PROCESS</option>
+          <option value="NO.2 PROCESS">NO.2 PROCESS</option>
+          <option value="WWT">WWT</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="role">근무 역할</label>
+
+        <select id="role">
+          <option value="">선택하세요</option>
+          <option value="기술장">기술장</option>
+          <option value="보드">보드</option>
+          <option value="현장">현장</option>
+        </select>
+      </div>
+
+      <button class="save-button" onclick="saveSettings()">
+        저장하기
+      </button>
+
+      <div id="savedMessage" class="saved-message">
+        저장되었습니다.
+      </div>
+
     </div>
 
   </div>
 
 
-  <script>
+  <!-- ================= 대근 등록 ================= -->
 
-    function openSettings() {
-      document.getElementById("homeScreen").classList.add("hidden");
-      document.getElementById("settingsScreen").classList.remove("hidden");
+  <div id="daegunScreen" class="hidden">
 
-      loadSettings();
+    <button class="back-button" onclick="goHome()">← 돌아가기</button>
+
+    <div class="header">
+      <h1>대근 등록</h1>
+      <p>휴가 날짜와 종류를 선택합니다.</p>
+    </div>
+
+    <div id="userSummary" class="user-summary"></div>
+
+    <div class="calendar-card">
+
+      <div class="calendar-header">
+
+        <button class="month-button" onclick="changeMonth(-1)">
+          ‹
+        </button>
+
+        <h2 id="calendarTitle"></h2>
+
+        <button class="month-button" onclick="changeMonth(1)">
+          ›
+        </button>
+
+      </div>
+
+
+      <div class="weekdays">
+        <div class="weekday">일</div>
+        <div class="weekday">월</div>
+        <div class="weekday">화</div>
+        <div class="weekday">수</div>
+        <div class="weekday">목</div>
+        <div class="weekday">금</div>
+        <div class="weekday">토</div>
+      </div>
+
+
+      <div id="calendarGrid" class="calendar-grid"></div>
+
+
+      <div class="selected-info">
+
+        <strong id="selectedDateText">
+          날짜를 선택하세요.
+        </strong>
+
+        <span id="selectedShiftText">
+          달력에서 날짜를 눌러주세요.
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="form-card">
+
+      <h2 class="leave-title">휴가 종류</h2>
+
+      <div class="leave-options">
+
+        <label class="leave-option">
+          <input type="radio" name="leaveType" value="연차">
+          <span>연차</span>
+        </label>
+
+        <label class="leave-option">
+          <input type="radio" name="leaveType" value="전반차">
+          <span>전반차</span>
+        </label>
+
+        <label class="leave-option">
+          <input type="radio" name="leaveType" value="후반차">
+          <span>후반차</span>
+        </label>
+
+        <label class="leave-option">
+          <input type="radio" name="leaveType" value="전반반차">
+          <span>전반반차 (2시간)</span>
+        </label>
+
+        <label class="leave-option">
+          <input type="radio" name="leaveType" value="후반반차">
+          <span>후반반차 (2시간)</span>
+        </label>
+
+      </div>
+
+      <br>
+
+      <button class="save-button" onclick="saveLeave()">
+        휴가 등록하기
+      </button>
+
+      <div id="leaveSavedMessage" class="saved-message">
+        등록되었습니다.
+      </div>
+
+      <div class="notice">
+        현재는 테스트 단계이므로 등록 내용은 이 기기의 브라우저에만
+        저장됩니다. 나중에 Firebase를 연결하면 팀원들과 공유됩니다.
+      </div>
+
+    </div>
+
+  </div>
+
+
+</div>
+
+
+<script>
+
+  let calendarDate = new Date();
+
+  let selectedDate = null;
+  let selectedWork = null;
+
+
+  /*
+    임시 교대 패턴
+
+    주 / 주 / 휴 / 휴 / 야 / 야 / 휴 / 휴
+
+    실제 정유1팀 교대 달력을 받으면
+    기준일만 정확하게 맞출 예정
+  */
+
+  const shiftPattern = [
+    "주",
+    "주",
+    "휴",
+    "휴",
+    "야",
+    "야",
+    "휴",
+    "휴"
+  ];
+
+
+  /*
+    현재는 임시 기준일.
+
+    2026년 9월 1일을
+    1조 패턴의 첫 번째 "주"로 가정.
+
+    실제 교대달력을 받으면 수정 예정.
+  */
+
+  const baseDate = new Date(2026, 8, 1);
+
+
+  const shiftOffsets = {
+    "1조": 0,
+    "2조": 2,
+    "3조": 4,
+    "4조": 6
+  };
+
+
+  function hideAllScreens() {
+
+    document
+      .getElementById("homeScreen")
+      .classList.add("hidden");
+
+    document
+      .getElementById("settingsScreen")
+      .classList.add("hidden");
+
+    document
+      .getElementById("daegunScreen")
+      .classList.add("hidden");
+  }
+
+
+  function goHome() {
+
+    hideAllScreens();
+
+    document
+      .getElementById("homeScreen")
+      .classList.remove("hidden");
+  }
+
+
+  /* ================= 개인 설정 ================= */
+
+
+  function openSettings() {
+
+    hideAllScreens();
+
+    document
+      .getElementById("settingsScreen")
+      .classList.remove("hidden");
+
+    loadSettings();
+  }
+
+
+  function saveSettings() {
+
+    const name =
+      document.getElementById("name").value.trim();
+
+    const shift =
+      document.getElementById("shift").value;
+
+    const area =
+      document.getElementById("area").value;
+
+    const role =
+      document.getElementById("role").value;
+
+
+    localStorage.setItem(
+      "userName",
+      name
+    );
+
+    localStorage.setItem(
+      "userShift",
+      shift
+    );
+
+    localStorage.setItem(
+      "userArea",
+      area
+    );
+
+    localStorage.setItem(
+      "userRole",
+      role
+    );
+
+
+    const message =
+      document.getElementById("savedMessage");
+
+    message.style.display = "block";
+
+    setTimeout(() => {
+      message.style.display = "none";
+    }, 2000);
+  }
+
+
+  function loadSettings() {
+
+    document.getElementById("name").value =
+      localStorage.getItem("userName") || "";
+
+    document.getElementById("shift").value =
+      localStorage.getItem("userShift") || "";
+
+    document.getElementById("area").value =
+      localStorage.getItem("userArea") || "";
+
+    document.getElementById("role").value =
+      localStorage.getItem("userRole") || "";
+  }
+
+
+
+  /* ================= 대근 등록 ================= */
+
+
+  function openDaegun() {
+
+    const name =
+      localStorage.getItem("userName");
+
+    const shift =
+      localStorage.getItem("userShift");
+
+    const area =
+      localStorage.getItem("userArea");
+
+    const role =
+      localStorage.getItem("userRole");
+
+
+    if (!name || !shift || !area || !role) {
+
+      alert(
+        "먼저 개인 설정을 완료해주세요."
+      );
+
+      openSettings();
+
+      return;
     }
 
 
-    function goHome() {
-      document.getElementById("settingsScreen").classList.add("hidden");
-      document.getElementById("homeScreen").classList.remove("hidden");
+    hideAllScreens();
+
+    document
+      .getElementById("daegunScreen")
+      .classList.remove("hidden");
+
+
+    document.getElementById(
+      "userSummary"
+    ).innerHTML = `
+      <strong>${name}</strong><br>
+      ${shift} · ${area} · ${role}
+    `;
+
+
+    renderCalendar();
+  }
+
+
+
+  /* ================= 근무 계산 ================= */
+
+
+  function getWorkType(date) {
+
+    const userShift =
+      localStorage.getItem("userShift") || "1조";
+
+
+    const offset =
+      shiftOffsets[userShift] || 0;
+
+
+    const oneDay =
+      1000 * 60 * 60 * 24;
+
+
+    const target =
+      new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      );
+
+
+    const base =
+      new Date(
+        baseDate.getFullYear(),
+        baseDate.getMonth(),
+        baseDate.getDate()
+      );
+
+
+    let days =
+      Math.round(
+        (target - base) / oneDay
+      );
+
+
+    let patternIndex =
+      (days + offset) %
+      shiftPattern.length;
+
+
+    if (patternIndex < 0) {
+      patternIndex +=
+        shiftPattern.length;
     }
 
 
-    function saveSettings() {
+    return shiftPattern[
+      patternIndex
+    ];
+  }
 
-      const name = document.getElementById("name").value;
-      const shift = document.getElementById("shift").value;
-      const area = document.getElementById("area").value;
-      const role = document.getElementById("role").value;
 
-      localStorage.setItem("userName", name);
-      localStorage.setItem("userShift", shift);
-      localStorage.setItem("userArea", area);
-      localStorage.setItem("userRole", role);
 
-      const message = document.getElementById("savedMessage");
+  /* ================= 달력 ================= */
 
-      message.style.display = "block";
 
-      setTimeout(() => {
-        message.style.display = "none";
-      }, 2000);
+  function renderCalendar() {
+
+    const year =
+      calendarDate.getFullYear();
+
+    const month =
+      calendarDate.getMonth();
+
+
+    document.getElementById(
+      "calendarTitle"
+    ).textContent =
+      `${year}년 ${month + 1}월`;
+
+
+    const firstDay =
+      new Date(year, month, 1)
+      .getDay();
+
+
+    const lastDate =
+      new Date(
+        year,
+        month + 1,
+        0
+      ).getDate();
+
+
+    const grid =
+      document.getElementById(
+        "calendarGrid"
+      );
+
+
+    grid.innerHTML = "";
+
+
+    for (
+      let i = 0;
+      i < firstDay;
+      i++
+    ) {
+
+      const empty =
+        document.createElement("div");
+
+      empty.className =
+        "calendar-day empty";
+
+      grid.appendChild(empty);
     }
 
 
-    function loadSettings() {
+    for (
+      let day = 1;
+      day <= lastDate;
+      day++
+    ) {
 
-      document.getElementById("name").value =
-        localStorage.getItem("userName") || "";
+      const date =
+        new Date(
+          year,
+          month,
+          day
+        );
 
-      document.getElementById("shift").value =
-        localStorage.getItem("userShift") || "";
 
-      document.getElementById("area").value =
-        localStorage.getItem("userArea") || "";
+      const workType =
+        getWorkType(date);
 
-      document.getElementById("role").value =
-        localStorage.getItem("userRole") || "";
+
+      const cell =
+        document.createElement("div");
+
+
+      cell.className =
+        "calendar-day";
+
+
+      if (
+        selectedDate &&
+        selectedDate.getFullYear() === year &&
+        selectedDate.getMonth() === month &&
+        selectedDate.getDate() === day
+      ) {
+
+        cell.classList.add(
+          "selected"
+        );
+      }
+
+
+      let shiftClass = "";
+
+      if (workType === "주") {
+        shiftClass = "shift-day";
+      }
+
+      else if (workType === "야") {
+        shiftClass = "shift-night";
+      }
+
+      else {
+        shiftClass = "shift-off";
+      }
+
+
+      cell.innerHTML = `
+
+        <div class="day-number">
+          ${day}
+        </div>
+
+        <span class="
+          shift-label
+          ${shiftClass}
+        ">
+          ${workType}
+        </span>
+
+      `;
+
+
+      cell.onclick = () => {
+
+        selectedDate = date;
+
+        selectedWork =
+          workType;
+
+        updateSelectedDate();
+
+        renderCalendar();
+      };
+
+
+      grid.appendChild(cell);
+    }
+  }
+
+
+
+  function updateSelectedDate() {
+
+    if (!selectedDate) {
+      return;
     }
 
-  </script>
+
+    const year =
+      selectedDate.getFullYear();
+
+    const month =
+      selectedDate.getMonth() + 1;
+
+    const day =
+      selectedDate.getDate();
+
+
+    document.getElementById(
+      "selectedDateText"
+    ).textContent =
+      `${year}년 ${month}월 ${day}일`;
+
+
+    let text = "";
+
+
+    if (selectedWork === "주") {
+      text = "기본 근무 : 주간";
+    }
+
+    else if (selectedWork === "야") {
+      text = "기본 근무 : 야간";
+    }
+
+    else {
+      text = "기본 근무 : 휴무";
+    }
+
+
+    document.getElementById(
+      "selectedShiftText"
+    ).textContent = text;
+  }
+
+
+
+  function changeMonth(value) {
+
+    calendarDate =
+      new Date(
+        calendarDate.getFullYear(),
+        calendarDate.getMonth() + value,
+        1
+      );
+
+
+    renderCalendar();
+  }
+
+
+
+  /* ================= 휴가 저장 ================= */
+
+
+  function saveLeave() {
+
+    if (!selectedDate) {
+
+      alert(
+        "휴가 날짜를 선택해주세요."
+      );
+
+      return;
+    }
+
+
+    const checked =
+      document.querySelector(
+        'input[name="leaveType"]:checked'
+      );
+
+
+    if (!checked) {
+
+      alert(
+        "휴가 종류를 선택해주세요."
+      );
+
+      return;
+    }
+
+
+    const leaveType =
+      checked.value;
+
+
+    const leaveData = {
+
+      id: Date.now(),
+
+      date:
+        selectedDate
+          .toISOString()
+          .split("T")[0],
+
+      workType:
+        selectedWork,
+
+      leaveType:
+        leaveType,
+
+      name:
+        localStorage.getItem(
+          "userName"
+        ),
+
+      shift:
+        localStorage.getItem(
+          "userShift"
+        ),
+
+      area:
+        localStorage.getItem(
+          "userArea"
+        ),
+
+      role:
+        localStorage.getItem(
+          "userRole"
+        )
+    };
+
+
+    const existing =
+      JSON.parse(
+        localStorage.getItem(
+          "leaveRecords"
+        ) || "[]"
+      );
+
+
+    existing.push(
+      leaveData
+    );
+
+
+    localStorage.setItem(
+      "leaveRecords",
+      JSON.stringify(existing)
+    );
+
+
+    const message =
+      document.getElementById(
+        "leaveSavedMessage"
+      );
+
+
+    message.textContent =
+      `${leaveData.date} / ${leaveType} 등록되었습니다.`;
+
+
+    message.style.display =
+      "block";
+
+
+    setTimeout(() => {
+
+      message.style.display =
+        "none";
+
+    }, 2500);
+
+  }
+
+</script>
 
 </body>
 </html>
