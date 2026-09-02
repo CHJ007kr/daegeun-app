@@ -384,6 +384,51 @@
 
     </div>
 
+
+    <!-- 개발 테스트용 사용자 전환 -->
+
+    <div class="form-card">
+
+      <h2 class="sub-title">
+        테스트 사용자 전환
+      </h2>
+
+      <p class="sub-description">
+        개발 테스트를 위해 저장된 일정은 유지한 채 사용자를 전환합니다.
+      </p>
+
+      <div class="test-user-buttons">
+
+        <button
+          class="test-user-button"
+          onclick="switchTestUser('최희주', '2조', 'NO.2 PROCESS', '현장')"
+        >
+          최희주 · 2조
+        </button>
+
+        <button
+          class="test-user-button"
+          onclick="switchTestUser('김철수', '1조', 'NO.2 PROCESS', '현장')"
+        >
+          김철수 · 1조
+        </button>
+
+        <button
+          class="test-user-button"
+          onclick="switchTestUser('박영희', '3조', 'NO.2 PROCESS', '현장')"
+        >
+          박영희 · 3조
+        </button>
+
+      </div>
+
+      <div
+        id="testUserMessage"
+        class="saved-message"
+      ></div>
+
+    </div>
+
   </div>
 
 

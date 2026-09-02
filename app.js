@@ -524,6 +524,25 @@ function getWorkType(date) {
     );
 
 
+  return getWorkTypeForShift(
+    date,
+    shift
+  );
+
+}
+
+
+
+/* =========================================================
+   지정한 교대조 기준 근무 계산
+========================================================= */
+
+function getWorkTypeForShift(
+  date,
+  shift
+) {
+
+
   const key =
     dateKey(
       date
@@ -985,6 +1004,96 @@ function loadSettings() {
 
 
 /* =========================================================
+   개발 테스트용 사용자 전환
+
+   기존 일정(calendarEvents)은 유지하고
+   사용자 정보와 교대조 변경 이력만 갱신
+========================================================= */
+
+function switchTestUser(
+  name,
+  shift,
+  area,
+  role
+) {
+
+  localStorage.setItem(
+    "userName",
+    name
+  );
+
+
+  localStorage.setItem(
+    "userShift",
+    shift
+  );
+
+
+  localStorage.setItem(
+    "userArea",
+    area
+  );
+
+
+  localStorage.setItem(
+    "userRole",
+    role
+  );
+
+
+  localStorage.removeItem(
+    "shiftChanges"
+  );
+
+
+  loadSettings();
+
+  renderShiftHistory();
+
+  refreshDateSensitiveUI();
+
+
+  const message =
+    document
+      .getElementById(
+        "testUserMessage"
+      );
+
+
+  if (
+    message
+  ) {
+
+    message.textContent =
+      name
+      +
+      " 사용자로 전환되었습니다.";
+
+
+    message.style.display =
+      "block";
+
+
+    setTimeout(
+
+      function() {
+
+        message.style.display =
+          "none";
+
+      },
+
+      2000
+
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
    설정 완료 여부
 ========================================================= */
 
@@ -1127,6 +1236,244 @@ function getEventsForDate(date) {
     }
 
   );
+
+}
+
+
+
+/* =========================================================
+   휴가 등록 화면용 일정
+
+   현재 사용자가 등록한 휴가만 반환
+========================================================= */
+
+function getMyLeaveEventsForDate(date) {
+
+  const currentName =
+    localStorage.getItem(
+      "userName"
+    );
+
+
+  return getEventsForDate(
+    date
+  ).filter(
+
+    function(event) {
+
+      return (
+        event.type === "휴가"
+        &&
+        event.name === currentName
+      );
+
+    }
+
+  );
+
+}
+
+
+
+/* =========================================================
+   근무 달력 화면용 일정
+
+   내가 등록한 일정과 내가 신청한 대근만 반환
+========================================================= */
+
+function getMyWorkEventsForDate(date) {
+
+  const currentName =
+    localStorage.getItem(
+      "userName"
+    );
+
+
+  return getEventsForDate(
+    date
+  ).map(
+
+    function(event) {
+
+      if (
+        event.name === currentName
+      ) {
+
+        return event;
+
+      }
+
+
+      if (
+        event.type === "휴가"
+      ) {
+
+        const request =
+          normalizeLeaveEvent(
+            event
+          );
+
+
+        const myClaim =
+          request.claims.find(
+
+            function(claim) {
+
+              return (
+                claim.name === currentName
+              );
+
+            }
+
+          );
+
+
+        if (
+          myClaim
+        ) {
+
+          return Object.assign(
+            {},
+            request,
+            {
+              type: "대근",
+              title:
+                "대근 "
+                +
+                myClaim.hours
+                +
+                "h",
+              isClaimedDaegun: true
+            }
+          );
+
+        }
+
+      }
+
+
+      return null;
+
+    }
+
+  ).filter(
+
+    function(event) {
+
+      return Boolean(
+        event
+      );
+
+    }
+
+  );
+
+}
+
+
+
+/* =========================================================
+   현재 사용자가 신청한 연차 대근 찾기
+========================================================= */
+
+function getAnnualLeaveDaegunForDate(date) {
+
+  const currentName =
+    localStorage.getItem(
+      "userName"
+    );
+
+
+  return getEventsForDate(
+    date
+  ).map(
+
+    function(event) {
+
+      return normalizeLeaveEvent(
+        event
+      );
+
+    }
+
+  ).find(
+
+    function(request) {
+
+      return (
+        request.type === "휴가"
+        &&
+        request.title === "연차"
+        &&
+        request.name !== currentName
+        &&
+        request.shift
+        &&
+        request.claims.some(
+
+          function(claim) {
+
+            return (
+              claim.name === currentName
+            );
+
+          }
+
+        )
+      );
+
+    }
+
+  );
+
+}
+
+
+
+/* =========================================================
+   근무 달력용 교대조와 근무 계산
+
+   연차 대근일만 휴가자의 교대조를 사용
+========================================================= */
+
+function getWorkCalendarInfo(date) {
+
+  const request =
+    getAnnualLeaveDaegunForDate(
+      date
+    );
+
+
+  if (
+    request
+  ) {
+
+    return {
+      shift: request.shift,
+      work: getWorkTypeForShift(
+        date,
+        request.shift
+      ),
+      isAnnualLeaveDaegun: true
+    };
+
+  }
+
+
+  const shift =
+    getShiftForDate(
+      date
+    );
+
+
+  return {
+    shift: shift,
+    work: getWorkTypeForShift(
+      date,
+      shift
+    ),
+    isAnnualLeaveDaegun: false
+  };
 
 }
 
@@ -1390,6 +1737,10 @@ function renderLeaveCalendar() {
 
     selectedDate,
 
+    getMyLeaveEventsForDate,
+
+    getWorkType,
+
     function(date) {
 
       selectedDate =
@@ -1496,7 +1847,9 @@ function updateLeaveSelected() {
 
     selectedDate,
 
-    "selectedEvents"
+    "selectedEvents",
+
+    getMyLeaveEventsForDate
 
   );
 
@@ -2744,6 +3097,16 @@ function renderWorkCalendar() {
 
     workSelectedDateValue,
 
+    getMyWorkEventsForDate,
+
+    function(date) {
+
+      return getWorkCalendarInfo(
+        date
+      ).work;
+
+    },
+
     function(date) {
 
       workSelectedDateValue =
@@ -2778,16 +3141,18 @@ function updateWorkSelected() {
   }
 
 
-  const work =
-    getWorkType(
+  const calendarInfo =
+    getWorkCalendarInfo(
       workSelectedDateValue
     );
+
+
+  const work =
+    calendarInfo.work;
 
 
   const shift =
-    getShiftForDate(
-      workSelectedDateValue
-    );
+    calendarInfo.shift;
 
 
   document
@@ -2827,7 +3192,17 @@ function updateWorkSelected() {
     )
     .textContent =
 
-      "기본 근무 : "
+      (
+        calendarInfo.isAnnualLeaveDaegun
+        ?
+        "대근 · "
+        +
+        shift
+        +
+        " "
+        :
+        "기본 근무 : "
+      )
 
       +
 
@@ -2842,7 +3217,13 @@ function updateWorkSelected() {
     )
     .textContent =
 
-      "적용 교대조 : "
+      (
+        calendarInfo.isAnnualLeaveDaegun
+        ?
+        "연차 휴가자 교대조 : "
+        :
+        "적용 교대조 : "
+      )
 
       +
 
@@ -2853,7 +3234,9 @@ function updateWorkSelected() {
 
     workSelectedDateValue,
 
-    "workSelectedEvents"
+    "workSelectedEvents",
+
+    getMyWorkEventsForDate
 
   );
 
@@ -2993,6 +3376,10 @@ function renderCalendar(
 
   selected,
 
+  eventsGetter,
+
+  workGetter,
+
   clickHandler
 
 ) {
@@ -3100,7 +3487,7 @@ function renderCalendar(
 
 
     const work =
-      getWorkType(
+      workGetter(
         date
       );
 
@@ -3186,7 +3573,7 @@ function renderCalendar(
 
 
     const events =
-      getEventsForDate(
+      eventsGetter(
         date
       );
 
@@ -3270,7 +3657,9 @@ function renderSelectedEvents(
 
   date,
 
-  elementId
+  elementId,
+
+  eventsGetter
 
 ) {
 
@@ -3282,7 +3671,7 @@ function renderSelectedEvents(
 
 
   const events =
-    getEventsForDate(
+    eventsGetter(
       date
     );
 
@@ -3310,6 +3699,36 @@ function renderSelectedEvents(
     events.map(
 
       function(event) {
+
+        /*
+          다른 사용자의 휴가에서 내가 신청한 대근
+        */
+
+        if (
+          event.isClaimedDaegun
+        ) {
+
+          return `
+
+            <div class="event-row">
+
+              <span>
+                ${event.title}
+              </span>
+
+
+              <button
+                class="delete-button"
+                onclick="cancelDaegunClaim(${event.id})"
+              >
+                대근 취소
+              </button>
+
+            </div>
+
+          `;
+
+        }
 
         /*
           휴가

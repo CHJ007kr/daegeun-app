@@ -890,3 +890,32 @@ body {
   box-shadow:
     0 3px 10px rgba(0, 0, 0, 0.08);
 }
+
+
+/* =========================================
+   테스트 사용자 전환
+========================================= */
+
+.test-user-buttons {
+  display: grid;
+  gap: 10px;
+}
+
+
+.test-user-button {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: white;
+  color: #222;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+
+.test-user-button:active {
+  transform: scale(0.99);
+  background: #f1f3f5;
+}
