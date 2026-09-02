@@ -1,17 +1,32 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>대근 관리 앱 TEST</title>
-<link rel="stylesheet" href="style.css">
- 
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>대근 관리 앱</title>
+
+  <!-- 디자인 파일 -->
+  <link
+    rel="stylesheet"
+    href="./style.css"
+  >
 </head>
+
 
 <body>
 
 <div class="app">
+
+
+  <!-- =====================================================
+       메인 화면
+  ====================================================== -->
 
   <div id="homeScreen">
 
@@ -20,126 +35,307 @@
       <p>정유1팀 대근 관리 시스템</p>
     </div>
 
+
     <div class="menu">
 
-      <div class="menu-card" onclick="openLeave()">
-        <div class="icon">🌴</div>
-        <h2>휴가 등록</h2>
-        <p>휴가를 등록하고 대근 요청을 생성합니다.</p>
+      <div
+        class="menu-card"
+        onclick="openLeave()"
+      >
+        <div class="icon">
+          🌴
+        </div>
+
+        <h2>
+          휴가 등록
+        </h2>
+
+        <p>
+          휴가를 등록하고 대근 요청을 생성합니다.
+        </p>
       </div>
 
-      <div class="menu-card" onclick="openWorkCalendar()">
-        <div class="icon">📅</div>
-        <h2>근무 달력</h2>
-        <p>주간 · 야간 · 휴무 · 대근 · 교육 일정을 확인합니다.</p>
+
+      <div
+        class="menu-card"
+        onclick="openWorkCalendar()"
+      >
+        <div class="icon">
+          📅
+        </div>
+
+        <h2>
+          근무 달력
+        </h2>
+
+        <p>
+          주간 · 야간 · 휴무 · 대근 · 교육 일정을 확인합니다.
+        </p>
       </div>
 
-      <div class="menu-card" onclick="openSettings()">
-        <div class="icon">⚙️</div>
-        <h2>개인 설정</h2>
-        <p>개인 근무정보와 교대조 변경 이력을 설정합니다.</p>
+
+      <div
+        class="menu-card"
+        onclick="openSettings()"
+      >
+        <div class="icon">
+          ⚙️
+        </div>
+
+        <h2>
+          개인 설정
+        </h2>
+
+        <p>
+          개인 근무정보와 교대조 변경 이력을 설정합니다.
+        </p>
       </div>
 
     </div>
 
   </div>
 
-  <div id="settingsScreen" class="hidden">
 
-    <button class="back-button" onclick="goHome()">
+
+  <!-- =====================================================
+       개인 설정
+  ====================================================== -->
+
+  <div
+    id="settingsScreen"
+    class="hidden"
+  >
+
+    <button
+      class="back-button"
+      onclick="goHome()"
+    >
       ← 돌아가기
     </button>
 
+
     <div class="header">
       <h1>개인 설정</h1>
-      <p>내 근무 정보를 설정합니다.</p>
+
+      <p>
+        내 근무 정보를 설정합니다.
+      </p>
     </div>
+
 
     <div class="form-card">
 
-      <div class="form-group">
-        <label>이름</label>
-        <input type="text" id="name" placeholder="이름을 입력하세요">
-      </div>
 
       <div class="form-group">
-        <label>현재 교대조</label>
+
+        <label for="name">
+          이름
+        </label>
+
+        <input
+          type="text"
+          id="name"
+          placeholder="이름을 입력하세요"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="shift">
+          현재 교대조
+        </label>
 
         <select id="shift">
-          <option value="">선택하세요</option>
-          <option value="1조">1조</option>
-          <option value="2조">2조</option>
-          <option value="3조">3조</option>
-          <option value="4조">4조</option>
+
+          <option value="">
+            선택하세요
+          </option>
+
+          <option value="1조">
+            1조
+          </option>
+
+          <option value="2조">
+            2조
+          </option>
+
+          <option value="3조">
+            3조
+          </option>
+
+          <option value="4조">
+            4조
+          </option>
+
         </select>
+
 
         <div class="notice">
+
           현재 날짜 기준 교대조가 자동으로 표시됩니다.
-          교대조가 변경되는 경우 아래의 '교대조 변경'에서 적용 시작일을 등록하세요.
+
+          교대조가 변경되는 경우 아래의
+          '교대조 변경'에서 적용 시작일을 등록하세요.
+
         </div>
+
       </div>
 
+
       <div class="form-group">
-        <label>근무지역</label>
+
+        <label for="area">
+          근무지역
+        </label>
 
         <select id="area">
-          <option value="">선택하세요</option>
-          <option value="NO.1 PROCESS">NO.1 PROCESS</option>
-          <option value="NO.2 PROCESS">NO.2 PROCESS</option>
-          <option value="WWT">WWT</option>
+
+          <option value="">
+            선택하세요
+          </option>
+
+          <option value="NO.1 PROCESS">
+            NO.1 PROCESS
+          </option>
+
+          <option value="NO.2 PROCESS">
+            NO.2 PROCESS
+          </option>
+
+          <option value="WWT">
+            WWT
+          </option>
+
         </select>
+
       </div>
+
 
       <div class="form-group">
-        <label>근무 역할</label>
+
+        <label for="role">
+          근무 역할
+        </label>
 
         <select id="role">
-          <option value="">선택하세요</option>
-          <option value="기술장">기술장</option>
-          <option value="보드">보드</option>
-          <option value="현장">현장</option>
+
+          <option value="">
+            선택하세요
+          </option>
+
+          <option value="기술장">
+            기술장
+          </option>
+
+          <option value="보드">
+            보드
+          </option>
+
+          <option value="현장">
+            현장
+          </option>
+
         </select>
+
       </div>
 
-      <button class="save-button" onclick="saveSettings()">
+
+      <button
+        class="save-button"
+        onclick="saveSettings()"
+      >
         기본 정보 저장하기
       </button>
 
-      <div id="savedMessage" class="saved-message">
+
+      <div
+        id="savedMessage"
+        class="saved-message"
+      >
         저장되었습니다.
       </div>
 
     </div>
 
+
+
+    <!-- ===================================================
+         교대조 변경
+    ==================================================== -->
+
     <div class="form-card">
 
-      <h2 class="sub-title">교대조 변경</h2>
+      <h2 class="sub-title">
+        교대조 변경
+      </h2>
+
 
       <p class="sub-description">
-        교대조가 변경된 경우 변경된 조와 적용 시작일을 등록하세요.
+
+        교대조가 변경된 경우
+        변경 후 교대조와 적용 시작일을 등록하세요.
+
         해당 날짜부터 근무 달력이 자동으로 변경됩니다.
+
       </p>
 
+
       <div class="form-group">
-        <label>변경 후 교대조</label>
+
+        <label for="changeShift">
+          변경 후 교대조
+        </label>
 
         <select id="changeShift">
-          <option value="">선택하세요</option>
-          <option value="1조">1조</option>
-          <option value="2조">2조</option>
-          <option value="3조">3조</option>
-          <option value="4조">4조</option>
+
+          <option value="">
+            선택하세요
+          </option>
+
+          <option value="1조">
+            1조
+          </option>
+
+          <option value="2조">
+            2조
+          </option>
+
+          <option value="3조">
+            3조
+          </option>
+
+          <option value="4조">
+            4조
+          </option>
+
         </select>
+
       </div>
+
 
       <div class="form-group">
-        <label>적용 시작일</label>
-        <input type="date" id="changeShiftDate">
+
+        <label for="changeShiftDate">
+          적용 시작일
+        </label>
+
+        <input
+          type="date"
+          id="changeShiftDate"
+        >
+
       </div>
 
-      <button class="secondary-button" onclick="addShiftChange()">
+
+      <button
+        class="secondary-button"
+        onclick="addShiftChange()"
+      >
         교대조 변경 등록
       </button>
+
 
       <div class="shift-history">
 
@@ -155,155 +351,432 @@
 
   </div>
 
-  <div id="leaveScreen" class="hidden">
 
-    <button class="back-button" onclick="goHome()">
+
+  <!-- =====================================================
+       휴가 등록
+  ====================================================== -->
+
+  <div
+    id="leaveScreen"
+    class="hidden"
+  >
+
+    <button
+      class="back-button"
+      onclick="goHome()"
+    >
       ← 돌아가기
     </button>
 
+
     <div class="header">
-      <h1>휴가 등록</h1>
-      <p>휴가 날짜와 종류를 선택합니다.</p>
+
+      <h1>
+        휴가 등록
+      </h1>
+
+      <p>
+        휴가 날짜와 종류를 선택합니다.
+      </p>
+
     </div>
 
-    <div id="userSummary" class="user-summary"></div>
+
+    <div
+      id="userSummary"
+      class="user-summary"
+    ></div>
+
+
 
     <div class="calendar-card">
 
+
       <div class="calendar-header">
-        <button class="month-button" onclick="changeMonth(-1)">‹</button>
+
+        <button
+          class="month-button"
+          onclick="changeMonth(-1)"
+        >
+          ‹
+        </button>
+
+
         <h2 id="calendarTitle"></h2>
-        <button class="month-button" onclick="changeMonth(1)">›</button>
+
+
+        <button
+          class="month-button"
+          onclick="changeMonth(1)"
+        >
+          ›
+        </button>
+
       </div>
+
+
 
       <div class="weekdays">
-        <div class="weekday">일</div>
-        <div class="weekday">월</div>
-        <div class="weekday">화</div>
-        <div class="weekday">수</div>
-        <div class="weekday">목</div>
-        <div class="weekday">금</div>
-        <div class="weekday">토</div>
+
+        <div class="weekday">
+          일
+        </div>
+
+        <div class="weekday">
+          월
+        </div>
+
+        <div class="weekday">
+          화
+        </div>
+
+        <div class="weekday">
+          수
+        </div>
+
+        <div class="weekday">
+          목
+        </div>
+
+        <div class="weekday">
+          금
+        </div>
+
+        <div class="weekday">
+          토
+        </div>
+
       </div>
 
-      <div id="calendarGrid" class="calendar-grid"></div>
+
+      <div
+        id="calendarGrid"
+        class="calendar-grid"
+      ></div>
+
 
       <div class="selected-info">
-        <strong id="selectedDateText">날짜를 선택하세요.</strong>
-        <span id="selectedShiftText">달력에서 날짜를 눌러주세요.</span>
-        <div id="selectedShiftInfo" class="selected-shift-info"></div>
-        <div id="selectedEvents" class="selected-event-list"></div>
+
+        <strong id="selectedDateText">
+          날짜를 선택하세요.
+        </strong>
+
+
+        <span id="selectedShiftText">
+          달력에서 날짜를 눌러주세요.
+        </span>
+
+
+        <div
+          id="selectedShiftInfo"
+          class="selected-shift-info"
+        ></div>
+
+
+        <div
+          id="selectedEvents"
+          class="selected-event-list"
+        ></div>
+
       </div>
 
     </div>
 
+
+
     <div class="form-card">
 
-      <h2 class="section-title">휴가 종류</h2>
+      <h2 class="section-title">
+        휴가 종류
+      </h2>
+
 
       <div class="leave-options">
 
-        <label class="leave-option">
-          <input type="radio" name="leaveType" value="연차">
-          <span>연차</span>
-        </label>
 
         <label class="leave-option">
-          <input type="radio" name="leaveType" value="전반차">
-          <span>전반차</span>
+
+          <input
+            type="radio"
+            name="leaveType"
+            value="연차"
+          >
+
+          <span>
+            연차
+          </span>
+
         </label>
 
-        <label class="leave-option">
-          <input type="radio" name="leaveType" value="후반차">
-          <span>후반차</span>
-        </label>
+
 
         <label class="leave-option">
-          <input type="radio" name="leaveType" value="전반반차(2시간)">
-          <span>전반반차 (2시간)</span>
+
+          <input
+            type="radio"
+            name="leaveType"
+            value="전반차"
+          >
+
+          <span>
+            전반차
+          </span>
+
         </label>
 
+
+
         <label class="leave-option">
-          <input type="radio" name="leaveType" value="후반반차(2시간)">
-          <span>후반반차 (2시간)</span>
+
+          <input
+            type="radio"
+            name="leaveType"
+            value="후반차"
+          >
+
+          <span>
+            후반차
+          </span>
+
+        </label>
+
+
+
+        <label class="leave-option">
+
+          <input
+            type="radio"
+            name="leaveType"
+            value="전반반차(2시간)"
+          >
+
+          <span>
+            전반반차 (2시간)
+          </span>
+
+        </label>
+
+
+
+        <label class="leave-option">
+
+          <input
+            type="radio"
+            name="leaveType"
+            value="후반반차(2시간)"
+          >
+
+          <span>
+            후반반차 (2시간)
+          </span>
+
         </label>
 
       </div>
 
+
       <br>
 
-      <button class="save-button" onclick="saveLeave()">
+
+      <button
+        class="save-button"
+        onclick="saveLeave()"
+      >
         휴가 등록하기
       </button>
 
-      <div id="leaveSavedMessage" class="saved-message"></div>
+
+      <div
+        id="leaveSavedMessage"
+        class="saved-message"
+      ></div>
+
 
       <div class="notice">
+
         현재는 테스트 단계이므로 이 기기에만 저장됩니다.
-        Firebase 연결 후에는 조건에 맞는 팀원들에게 대근 요청이 전달되도록 변경할 예정입니다.
+
+        Firebase 연결 후에는 조건에 맞는 팀원들에게
+        대근 요청이 전달되도록 변경할 예정입니다.
+
       </div>
 
     </div>
 
   </div>
 
-  <div id="workCalendarScreen" class="hidden">
 
-    <button class="back-button" onclick="goHome()">
+
+  <!-- =====================================================
+       근무 달력
+  ====================================================== -->
+
+  <div
+    id="workCalendarScreen"
+    class="hidden"
+  >
+
+    <button
+      class="back-button"
+      onclick="goHome()"
+    >
       ← 돌아가기
     </button>
 
+
     <div class="header">
-      <h1>근무 달력</h1>
-      <p>기본 교대근무와 실제 일정을 확인합니다.</p>
+
+      <h1>
+        근무 달력
+      </h1>
+
+      <p>
+        기본 교대근무와 실제 일정을 확인합니다.
+      </p>
+
     </div>
 
-    <div id="workUserSummary" class="user-summary"></div>
+
+    <div
+      id="workUserSummary"
+      class="user-summary"
+    ></div>
+
+
 
     <div class="calendar-card">
 
+
       <div class="calendar-header">
-        <button class="month-button" onclick="changeWorkMonth(-1)">‹</button>
+
+        <button
+          class="month-button"
+          onclick="changeWorkMonth(-1)"
+        >
+          ‹
+        </button>
+
+
         <h2 id="workCalendarTitle"></h2>
-        <button class="month-button" onclick="changeWorkMonth(1)">›</button>
+
+
+        <button
+          class="month-button"
+          onclick="changeWorkMonth(1)"
+        >
+          ›
+        </button>
+
       </div>
+
+
 
       <div class="weekdays">
-        <div class="weekday">일</div>
-        <div class="weekday">월</div>
-        <div class="weekday">화</div>
-        <div class="weekday">수</div>
-        <div class="weekday">목</div>
-        <div class="weekday">금</div>
-        <div class="weekday">토</div>
+
+        <div class="weekday">
+          일
+        </div>
+
+        <div class="weekday">
+          월
+        </div>
+
+        <div class="weekday">
+          화
+        </div>
+
+        <div class="weekday">
+          수
+        </div>
+
+        <div class="weekday">
+          목
+        </div>
+
+        <div class="weekday">
+          금
+        </div>
+
+        <div class="weekday">
+          토
+        </div>
+
       </div>
 
-      <div id="workCalendarGrid" class="calendar-grid"></div>
+
+
+      <div
+        id="workCalendarGrid"
+        class="calendar-grid"
+      ></div>
+
+
 
       <div class="selected-info">
-        <strong id="workSelectedDate">날짜를 선택하세요.</strong>
-        <span id="workSelectedShift">달력에서 날짜를 눌러주세요.</span>
-        <div id="workSelectedShiftInfo" class="selected-shift-info"></div>
-        <div id="workSelectedEvents" class="selected-event-list"></div>
+
+        <strong id="workSelectedDate">
+          날짜를 선택하세요.
+        </strong>
+
+
+        <span id="workSelectedShift">
+          달력에서 날짜를 눌러주세요.
+        </span>
+
+
+        <div
+          id="workSelectedShiftInfo"
+          class="selected-shift-info"
+        ></div>
+
+
+        <div
+          id="workSelectedEvents"
+          class="selected-event-list"
+        ></div>
+
       </div>
 
     </div>
 
+
+
+    <!-- 현재 테스트용 -->
+
     <div class="form-card">
 
-      <h2 class="section-title">일정 테스트 등록</h2>
+      <h2 class="section-title">
+        일정 테스트 등록
+      </h2>
+
 
       <div class="form-group">
-        <label>일정 종류</label>
+
+        <label for="extraEventType">
+          일정 종류
+        </label>
 
         <select id="extraEventType">
-          <option value="대근">대근</option>
-          <option value="교육">교육</option>
+
+          <option value="대근">
+            대근
+          </option>
+
+          <option value="교육">
+            교육
+          </option>
+
         </select>
+
       </div>
 
+
       <div class="form-group">
-        <label>시간</label>
+
+        <label for="extraEventHours">
+          시간
+        </label>
 
         <input
           type="number"
@@ -312,14 +785,23 @@
           max="24"
           value="12"
         >
+
       </div>
 
-      <button class="save-button" onclick="saveExtraEvent()">
+
+      <button
+        class="save-button"
+        onclick="saveExtraEvent()"
+      >
         선택한 날짜에 일정 등록
       </button>
 
+
       <div class="notice">
-        현재는 대근과 교육이 달력에 어떻게 표시되는지 확인하기 위한 테스트 기능입니다.
+
+        현재는 대근과 교육이 달력에 어떻게 표시되는지
+        확인하기 위한 테스트 기능입니다.
+
       </div>
 
     </div>
@@ -329,5 +811,9 @@
 </div>
 
 
+<!-- 기능 파일 -->
+<script src="./app.js"></script>
+
 </body>
+
 </html>
